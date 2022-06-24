@@ -16,6 +16,7 @@ class User(db.Model, UserMixin):
     name = db.Column(db.String(60))
     telephone = db.Column(db.String(15), unique=True)
     login = db.Column(db.String(32), unique=True)
+    password = db.Column(db.String(500))
     info = db.Column(db.String(70))
     date_registration = db.Column(db.DateTime, default=str(datetime.now())[:10])
     # theme =
