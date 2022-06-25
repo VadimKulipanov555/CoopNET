@@ -1,0 +1,62 @@
+{% extends 'bases/FormBase.html' %}
+
+{% block title %}
+
+    Авторизация
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="FormSide d-flex flex-row align-items-center justify-content-between border">
+
+        <div class="me-5">
+            <a href="/HomePage"><img src="/static/images/AuthImage.png" alt="IMG"></a>
+        </div>
+
+        <!-- Форма авторизации -->
+        <form class="w-100 d-flex flex-column align-items-center">
+
+            <h1 class="h3 mb-3 fw-normal" style="color: #470323;">Авторизация</h1>
+
+            <!-- Электронная почта -->
+            <div class="form-floating mb-2">
+                <input type="email" class="form-control" style="border-radius: 30px;" name="email" id="email"
+                       placeholder="E-mail">
+                <label for="email">E-mail</label>
+            </div>
+
+            <!-- Пароля -->
+            <div class="form-floating mb-2">
+                <input type="password" class="form-control" style="border-radius: 30px;" name="password" id="password"
+                       placeholder="Пароль">
+                <label for="password">Пароль</label>
+            </div>
+
+            <!-- Кнопка входа -->
+            <button class="w-100 mt-1 btn btn-lg" style="border-radius: 30px; background-color: #BFAE1F; color: white;"
+                    name="submit" type="submit">Войти
+            </button>
+
+            <!-- region Вывод сообщений об ошибках -->
+    {#                    <div class="Messages mt-4">#}
+    {#                        {% for field,error in form.errors.items() %}#}
+    {#                            <h6 style="color: red;">Ошибка: {{ error[0] }}</h6><br>#}
+    {#                        {% endfor %}#}
+    {#                        {% for msg in get_flashed_messages() %}#}
+    {#                            <h6 style="color: red;">{{ msg }}</h6>#}
+    {#                        {% endfor %}#}
+    {#                    </div>#}
+            <!-- endregion -->
+
+            <!-- Переход на страницу регистрации -->
+            <div class="form-text text-center mt-4 text-dark">Нет аккаунта? <a href="/Registration"
+                                                                               class="fw-bold"
+                                                                               style="text-decoration: none; color: #BFAE1F;">Зарегистрируйся!</a>
+            </div>
+            <p class="mt-4 mb-3 text-muted">© 2017–2022</p>
+        </form>
+
+    </div>
+
+{% endblock %}
