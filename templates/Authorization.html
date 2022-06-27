@@ -39,14 +39,9 @@
             </button>
 
             <!-- region Вывод сообщений об ошибках -->
-    {#                    <div class="Messages mt-4">#}
-    {#                        {% for field,error in form.errors.items() %}#}
-    {#                            <h6 style="color: red;">Ошибка: {{ error[0] }}</h6><br>#}
-    {#                        {% endfor %}#}
-    {#                        {% for msg in get_flashed_messages() %}#}
-    {#                            <h6 style="color: red;">{{ msg }}</h6>#}
-    {#                        {% endfor %}#}
-    {#                    </div>#}
+            <div class="Messages mt-4">
+                <h6 style="color: red;">{{ message }}</h6>
+            </div>
             <!-- endregion -->
 
             <!-- Переход на страницу регистрации -->
