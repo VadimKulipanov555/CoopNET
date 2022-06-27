@@ -105,7 +105,6 @@ def isValidUser(error, user):
 def registration():
     error = {}
     not_error = {}
-    print('Hello')
     if request.method == "POST":
         isValidName(error, not_error, request.form['name'])
         isValidLogin(error, not_error, request.form['login'])
@@ -116,10 +115,6 @@ def registration():
         sql = text("select count(*) from 'Пользователь' where email=='{}'".format(request.form['reg_email'].lower()))
         user = db.engine.execute(sql)
         isValidUser(error, user)
-
-        print('Hello 1')
-        print(error)
-        print(not_error)
 
         if not error:
             sql = text("INSERT INTO 'Пользователь' (email, name, telephone, login, password, info, date_registration) "
@@ -142,6 +137,27 @@ def registration():
 
 @app.route('/', methods=['GET', 'POST'])
 def authorization():
+    if request.method == 'POST':
+        error = {}
+        sql = text("select count(*) as ct from 'Пользователь' where email=='{}'".format(request.form['email'].lower()))
+        user = [row for row in db.engine.execute(sql)]
+        isValidUser(error, user[0][0])
+
+        if error:
+            error = {}
+            sql = text("select email, password from 'Пользователь' where email=='{}'".format(request.form['email'].lower()))
+            info_user = [row for row in db.engine.execute(sql)]
+            email, password = info_user[0]
+        else:
+            return render_template('Authorization.html', title='Authorization', message='Ошибка ввода данных')
+
+        if check_password_hash(password, request.form['password']):
+            load_user(email)
+            # Тут должна быть страница после авторизации
+            # return render_template('test.html', title='test')
+        else:
+            return render_template('Authorization.html', title='Authorization', message='Ошибка ввода данных')
+
     return render_template('Authorization.html', title='Authorization')
 
 
