@@ -34,10 +34,11 @@
                          aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                             <div class="modal-content">
+
                                 <div class="modal-header d-flex flex-column justify-content-center align-items-center">
-                                    <a href="/static" class=""><img src="/static/images/Avatar.png" alt="Avatar"
-                                                                    width="100" height="100"
-                                                                    class="rounded-circle">
+                                    <a href="/" class=""><img src="/static/images/Avatar.png" alt="Avatar"
+                                                                  width="100" height="100"
+                                                                  class="rounded-circle">
                                     </a>
                                     <div class="UserInfo my-3 d-flex flex-column justify-content-center align-items-center">
                                         <h4 class="m-0 mb-1">UserName</h4>
@@ -46,20 +47,107 @@
                                 </div>
 
                                 <div class="modal-body">
+
+                                    <!-- Кнопка создания группового чата -->
                                     <button class="MenuItem d-flex flex-row align-items-center justify-content-start" style="border: none; outline: none; background-color: inherit">
-                                        <img src="/static/images/chat-square-dots.svg" alt="Avatar" width="20" height="20"
-                                             class="me-2">
-                                        <p class="m-0">Создать групповой чат</p>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                             fill="currentColor" class="me-2 bi bi-chat-square-dots" viewBox="0 0 16 16">
+                                            <path d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-2.5a2 2 0 0 0-1.6.8L8 14.333 6.1 11.8a2 2 0 0 0-1.6-.8H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2.5a1 1 0 0 1 .8.4l1.9 2.533a1 1 0 0 0 1.6 0l1.9-2.533a1 1 0 0 1 .8-.4H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+                                            <path d="M5 6a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                                        </svg>
+                                        <p class="m-0 text-center">Создать групповой чат</p>
                                     </button>
+
+                                    <!-- Кнопка смены фото профиля -->
+                                    <button class="MenuItem mt-2 d-flex flex-row align-items-center justify-content-start" data-bs-toggle="modal" data-bs-target="#ChangePhotoModal" style="border: none; outline: none; background-color: inherit">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                             fill="currentColor" class="me-2 bi bi-person-bounding-box" viewBox="0 0 16 16">
+                                            <path d="M1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 1-1 0v-3A1.5 1.5 0 0 1 1.5 0h3a.5.5 0 0 1 0 1h-3zM11 .5a.5.5 0 0 1 .5-.5h3A1.5 1.5 0 0 1 16 1.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 1-.5-.5zM.5 11a.5.5 0 0 1 .5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 1 0 1h-3A1.5 1.5 0 0 1 0 14.5v-3a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v3a1.5 1.5 0 0 1-1.5 1.5h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 1 .5-.5z"/>
+                                            <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                                        </svg>
+                                        <p class="m-0">Изменить/удалить фото профиля</p>
+                                    </button>
+
+                                    <!-- Кнопка выхода из профиля -->
+                                    <button class="MenuItem mt-2 d-flex flex-row align-items-center justify-content-start" onclick="window.location.href='/logout'" style="border: none; outline: none; background-color: inherit">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                             fill="darkred" class="me-1 bi bi-box-arrow-right" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd"
+                                                  d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>
+                                            <path fill-rule="evenodd"
+                                                  d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
+                                        </svg>
+                                        <p class="m-0" style="color: darkred">Выйти</p>
+                                    </button>
+
                                 </div>
 
                                 <div class="modal-footer d-flex justify-content-center">
                                     <p class="text-secondary" style="font-size: smaller">Company name</p>
                                 </div>
+
                             </div>
                         </div>
                     </div>
                  <!-- endregion -->
+
+                <!-- region Модальное окно смены фото профиля -->
+                                        <div class="modal fade" id="ChangePhotoModal" tabindex="-1" aria-labelledby="ChangePhotoModalLabel"
+                                             aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                                                <div class="modal-content">
+
+                                                    <div class="modal-header d-flex justify-content-center align-items-center">
+                                                        <h5 class="modal-title me-2" id="InterlocutorModalLabel">Фото профиля</h5>
+                                                    </div>
+
+                                                    <div class="modal-body d-flex flex-column align-items-center justify-content-center">
+
+                                                        <!-- Profile picture image-->
+                                                        <div class="d-flex flex-column align-items-center">
+                                                            <img class="img-account-profile rounded-circle mb-2"
+                                                                 src="{{ url_for('useravatar') }}" alt="" width="315"
+                                                                 height="315">
+                                                            <a href="{{ url_for('removeavatar') }}" class="text-danger"
+                                                               style="text-decoration: none;">Удалить фото профиля?</a>
+                                                        </div>
+                                                        <!-- Profile picture help block-->
+                                                        <div class="small font-italic text-muted mb-2 mt-4">Размер фото
+                                                            не более 5 MB
+                                                        </div>
+                                                        <form action="{{ url_for('upload') }}" method="post"
+                                                              enctype="multipart/form-data" class="d-flex flex-row">
+                                                            <div class="text-center me-2">
+                                                                <input name="file" type="file" id="file"
+                                                                       class="input input__file"
+                                                                       style="opacity: 0; visibility: hidden; position: absolute;">
+                                                                <label for="file"
+                                                                       class="input__file-button border border-primary p-2"
+                                                                       style="border-radius: 10px">
+                                                                    <span class="input__file-icon-wrapper mr-1 text-primary">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="25" fill="currentColor"
+                                                                             class="bi bi-upload input__file-icon" viewBox="0 0 16 16">
+                                                                            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                                                                            <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
+                                                                        </svg>
+                                                                    </span>
+                                                                    <span class="input__file-button-text text-primary">Выберите файл</span>
+                                                                </label>
+                                                            </div>
+                                                            <input type="submit" class="btn btn-primary"
+                                                                   value="Загрузить">
+                                                        </form>
+
+                                                    </div>
+
+                                                    <div class="modal-footer d-flex justify-content-start">
+                                                        <p class="text-secondary" style="font-size: smaller">Company name</p>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <!-- endregion -->
 
                 <input type="search" name="q" class="form-control" value="" placeholder="Search..." aria-label="Search">
             </div>
@@ -71,7 +159,7 @@
                 <!-- Чат 1 -->
                 <div class="Chat px-3 d-flex flex-row align-items-center justify-content-between">
                     <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">
-                        <a href="/static" class="me-2">
+                        <a href="/" class="me-2">
                             <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"
                                  class="rounded-circle">
                         </a>
@@ -89,7 +177,7 @@
                 <!-- Чат 2 -->
                 <div class="Chat px-3 my-3 d-flex flex-row align-items-center justify-content-between">
                     <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">
-                        <a href="/static" class="me-2">
+                        <a href="/" class="me-2">
                             <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"
                                  class="rounded-circle">
                         </a>
@@ -107,7 +195,7 @@
                 <!-- Чат 3 -->
                 <div class="Chat px-3 my-3 d-flex flex-row align-items-center justify-content-between">
                     <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">
-                        <a href="/static" class="me-2">
+                        <a href="/" class="me-2">
                             <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"
                                  class="rounded-circle">
                         </a>
@@ -125,7 +213,7 @@
                 <!-- Чат 4 -->
                 <div class="Chat px-3 my-3 d-flex flex-row align-items-center justify-content-between">
                     <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">
-                        <a href="/static" class="me-2">
+                        <a href="/" class="me-2">
                             <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"
                                  class="rounded-circle">
                         </a>
@@ -143,7 +231,7 @@
                 <!-- Чат 5 -->
                 <div class="Chat px-3 my-3 d-flex flex-row align-items-center justify-content-between">
                     <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">
-                        <a href="/static" class="me-2">
+                        <a href="/" class="me-2">
                             <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"
                                  class="rounded-circle">
                         </a>
@@ -161,7 +249,7 @@
                 <!-- Чат 6 -->
                 <div class="Chat px-3 my-3 d-flex flex-row align-items-center justify-content-between">
                     <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">
-                        <a href="/static" class="me-2">
+                        <a href="/" class="me-2">
                             <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"
                                  class="rounded-circle">
                         </a>
@@ -179,7 +267,7 @@
                 <!-- Чат 7 -->
                 <div class="Chat px-3 my-3 d-flex flex-row align-items-center justify-content-between" style="background-color: #8C4164">
                     <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">
-                        <a href="/static" class="me-2">
+                        <a href="/" class="me-2">
                             <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"
                                  class="rounded-circle">
                         </a>
@@ -197,7 +285,7 @@
                 <!-- Чат 8 -->
                 <div class="Chat px-3 my-3 d-flex flex-row align-items-center justify-content-between" style="background-color: #8C4164">
                     <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">
-                        <a href="/static" class="me-2">
+                        <a href="/" class="me-2">
                             <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"
                                  class="rounded-circle">
                         </a>
@@ -215,7 +303,7 @@
                 <!-- Чат 9 -->
                 <div class="Chat px-3 d-flex flex-row align-items-center justify-content-between" style="background-color: #BFAE1F">
                     <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">
-                        <a href="/static" class="me-2">
+                        <a href="/" class="me-2">
                             <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"
                                  class="rounded-circle">
                         </a>
@@ -247,10 +335,81 @@
                         </svg>
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="dropdown03">
-                        <li><a class="dropdown-item" href="/static">Профиль</a></li>
-                        <li><a class="dropdown-item" href="/static">Очистить историю</a></li>
-                        <li><a class="dropdown-item" href="/static">Удалить чат</a></li>
+                        <li>
+                            <button class="dropdown-item d-flex align-items-center justify-content-start" data-bs-toggle="modal" data-bs-target="#interlocutorModal"
+                                    style="border: none; outline: none; background-color: inherit">
+                               Профиль
+                            </button>
+                        </li>
                     </ul>
+                    <!-- region Модальное окно профиля собеседника -->
+                            <div class="modal fade" id="interlocutorModal" tabindex="-1" aria-labelledby="InterlocutorModalLabel"
+                                 aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                                    <div class="modal-content">
+
+                                        <div class="modal-header d-flex flex-column justify-content-center align-items-start">
+
+                                            <div class="d-flex flex-row align-self-stretch justify-content-between align-items-center">
+                                                <h5 class="modal-title me-2" id="InterlocutorModalLabel">Информация</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                            </div>
+                                            <div class="ProfileNameInfo mt-3 d-flex flex-row align-items-center justify-conten-start">
+                                                <a href="/" class="me-3"><img src="/static/images/Avatar.png"
+                                                                          alt="Avatar"
+                                                                          width="100" height="100"
+                                                                          class="rounded-circle">
+                                                </a>
+                                                <div class="d-flex flex-column justify-content-center align-items-start">
+                                                    <h4 class="m-0 mb-1">UserName</h4>
+                                                    <p class="m-0 mt-1 text-secondary" style="font-size: smaller">name@example.com</p>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="modal-body">
+
+                                            <!-- Информация о телефоне собеседника -->
+                                            <div class="d-flex flex-row align-items-center justify-content-start" style="border: none; outline: none; background-color: inherit">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                                     fill="currentColor" class="me-2 bi bi-telephone"
+                                                     viewBox="0 0 16 16">
+                                                    <path d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.568 17.568 0 0 0 4.168 6.608 17.569 17.569 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.678.678 0 0 0-.58-.122l-2.19.547a1.745 1.745 0 0 1-1.657-.459L5.482 8.062a1.745 1.745 0 0 1-.46-1.657l.548-2.19a.678.678 0 0 0-.122-.58L3.654 1.328zM1.884.511a1.745 1.745 0 0 1 2.612.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.678.678 0 0 0 .178.643l2.457 2.457a.678.678 0 0 0 .644.178l2.189-.547a1.745 1.745 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.634 18.634 0 0 1-7.01-4.42 18.634 18.634 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877L1.885.511z"/>
+                                                </svg>
+                                                <div class="info">
+                                                    <p class="m-0" style="font-size: medium">+7 999 888 77 66</p>
+                                                    <p class="m-0 text-secondary" style="font-size: smaller">Phone number</p>
+                                                </div>
+
+                                            </div>
+
+                                            <!-- Информация о логине собесебника -->
+                                            <div class="d-flex mt-2 flex-row align-items-center justify-content-start" style="border: none; outline: none; background-color: inherit">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                                     fill="currentColor" class="me-2 bi bi-info-circle"
+                                                     viewBox="0 0 16 16">
+                                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                                    <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                                                </svg>
+                                                <div class="info">
+                                                    <p class="m-0" style="font-size: medium">UserLogin</p>
+                                                    <p class="m-0 text-secondary" style="font-size: smaller">Login</p>
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                        <div class="modal-footer d-flex justify-content-start">
+                                            <p class="text-secondary" style="font-size: smaller">Company name</p>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- endregion -->
                 </div>
             <!-- endregion -->
 
@@ -260,15 +419,28 @@
 {#                    <div class="InformationMessage p-3 border d-flex align-items-center justify-content-center" style="border-radius: 10px; background-color: white;">#}
 {#                        <p class="m-0">There's nothing here yet... Write first</p>#}
 {#                    </div>#}
+
+                    <!-- Сообщение 1 -->
                     <div class="MessageBlock d-flex flex-row align-items-end">
-                        <a href="/static" class="me-2"><img src="/static/images/Avatar.png" alt="Avatar" width="30" height="30"
-                                                            class="rounded-circle">
+                        <a href="/" class="me-2"><img src="/static/images/Avatar.png" alt="Avatar" width="30" height="30"
+                             class="rounded-circle">
                         </a>
                         <div class="MessageAndTime p-2 d-flex flex-row align-items-center justify-content-between border" style="background-color: white; border-radius: 10px">
-                            <p class="m-0 me-3">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab accusamus aliquam cum deserunt dignissimos, ducimus eum facilis illo labore magni molestias nisi quasi quibusdam ratione reiciendis reprehenderit, temporibus, ut. Magni?</p>
-                            <p class="m-0 d-flex justify-self-center align-self-end" style="font-size: smaller">00:00</p>
+                            <p class="m-0 me-3">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab at autem dicta ea eaque enim illo illum necessitatibus nesciunt non, officiis quasi qui ratione recusandae rem soluta tempore velit voluptates. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab accusamus aliquam cum deserunt dignissimos, ducimus eum facilis illo labore magni molestias nisi quasi quibusdam ratione reiciendis reprehenderit, temporibus, ut. Magni?</p>
+                            <div class="m-0 d-flex flex-column align-self-stretch justify-content-between align-items-center">
+                                <form action="{{ url_for('deletemessage') }}" method="post">
+                                    <button type="submit" name="submit" value="1" class="mt-1 d-flex justify-self-center" style="border: none; outline: none; background-color: inherit">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="darkred"
+                                             class="bi bi-trash3" viewBox="0 0 16 16">
+                                            <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z"/>
+                                        </svg>
+                                    </button>
+                                </form>
+                                <p class="m-0 d-flex justify-self-center" style="font-size: smaller">00:00</p>
+                            </div>
                         </div>
                     </div>
+
                 </div>
             <!-- endregion -->
 
