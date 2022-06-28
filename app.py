@@ -1,15 +1,14 @@
-from flask import Flask, url_for, redirect, session, render_template, request
+from flask import Flask, url_for, redirect, session, render_template, request, flash, make_response
 
 from myConfig import Config
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask_login import LoginManager, logout_user
+#from flask_migrate import Migrate
+from flask_login import LoginManager, UserMixin, current_user, logout_user, login_required
 import phonenumbers
 import re
 from datetime import datetime
 from sqlalchemy import text
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import LoginManager, UserMixin, login_user, logout_user
 
 
 app = Flask(__name__)
@@ -17,7 +16,7 @@ app.config.from_object(Config)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///coopNet.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+#migrate = Migrate(app, db)
 login_manager = LoginManager(app)
 
 
@@ -39,6 +38,50 @@ class User(db.Model, UserMixin):
     date_registration = db.Column(db.DateTime, default=str(datetime.now())[:10])
     # theme =
     photo = db.Column(db.BLOB, nullable=True)
+
+    # Получаем аватар пользователя
+    def GetAvatar(self, app):
+        img = None
+        if not self.photo:
+            try:
+                with app.open_resource(app.root_path + url_for('static', filename='images/Avatar.png'),
+                                       'rb') as f:
+                    img = f.read()
+            except FileNotFoundError as e:
+                print(f'Не найден аватар по умолчанию: {str(e)}')
+        else:
+            img = self.photo
+
+        return img
+
+    # Верификация типа изображения
+    def VerifyExt(self, filename):
+        ext = filename.rsplit('.', 1)[1]
+        if ext in ('png', 'PNG'):
+            return True
+        return False
+
+    # Обновление аватара
+    def UpdateAvatar(self, avatar):
+        if not avatar:
+            return False
+        try:
+            self.photo = avatar
+            db.session.commit()
+        except Exception as e:
+            print(f'Ошибка обновления аватара в БД: {str(e)}')
+            return False
+        return True
+
+    # Удаление аватара
+    def RemoveAvatar(self):
+        try:
+            self.photo = None
+            db.session.commit()
+        except Exception as e:
+            print(f'Ошибка удаления аватара из БД: {str(e)}')
+            return False
+        return True
 
 
 class Chat(db.Model):
@@ -99,6 +142,7 @@ def isValidLogin(error, not_error, login):
         error['login'] = 'Ваш логин должен быть от {} до {}'.format(minLogin, maxLogin)
     else:
         not_error['login'] = login
+
 
 def isValidPhone(error, not_error, phone):
     try:
@@ -234,6 +278,68 @@ def authorization():
 
     return render_template('Authorization.html', title='Authorization')
 
+
+@app.route('/HomePage', methods=['GET', 'POST'])
+def homepage():
+    return render_template('HomePage.html')
+
+
+#Обработчик удаления аватара пользователя
+@app.route('/removeavatar', methods=['POST', 'GET'])
+@login_required
+def removeavatar():
+    result = current_user.RemoveAvatar()
+    if not result:
+        flash('Ошибка удаления аватара', 'error')
+    flash('Аватар успешно удален', 'success')
+    return redirect('/HomePage')
+
+
+# Обработчик получения аватара пользователя
+@app.route('/useravatar')
+@login_required
+def useravatar():
+    user = current_user
+    img = user.GetAvatar(app)
+    if not img:
+        return ""
+
+    h = make_response(img)
+    h.headers['Content-Type'] = '/Image/png'
+    return h
+
+
+# Обработчик загрузки аватара пользователя
+@app.route('/upload', methods=['POST', 'GET'])
+@login_required
+def upload():
+    if request.method == 'POST':
+        file = request.files.get('file')
+        if file and current_user.VerifyExt(file.filename):
+            try:
+                img = file.read()
+                result = current_user.UpdateAvatar(img)
+                if not result:
+                    flash('Ошибка обновления аватара', 'error')
+                flash('Аватар успешно обновлен', 'success')
+            except FileNotFoundError as e:
+                flash('Ошибка обновления аватара', 'error')
+                return redirect(url_for('index'))
+        return redirect(f'/Profile/{current_user.id}')
+    else:
+        return redirect(f'/Profile/{current_user.id}')
+
+
+@app.route('/deletemessage', methods=['POST', 'GET'])
+def deletemessage():
+    messageid = request.form['submit']
+    try:
+        sql = text('delete from Сообщение '
+                   ' where message_id == ' + str(messageid))
+        db.engine.execute(sql)
+    except:
+        flash('Ошибка удаления сообщения')
+    return redirect(url_for('homepage'))
 
 if __name__ == '__main__':
     app.run(debug=True)
