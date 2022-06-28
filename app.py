@@ -9,6 +9,7 @@ import re
 from datetime import datetime
 from sqlalchemy import text
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import LoginManager, UserMixin, login_user, logout_user
 
 
 app = Flask(__name__)
@@ -18,6 +19,47 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login_manager = LoginManager(app)
+
+
+chat_user = db.Table(
+    'Список Участников Чата',
+    db.Column('chat_id', db.Integer(), db.ForeignKey('Чат.chat_id')),
+    db.Column('email', db.String(320), db.ForeignKey('Пользователь.email'))
+)
+
+
+class User(db.Model, UserMixin):
+    __tablename__ = 'Пользователь'
+    email = db.Column(db.String(320), primary_key=True)
+    name = db.Column(db.String(60))
+    telephone = db.Column(db.String(15), unique=True)
+    login = db.Column(db.String(32), unique=True)
+    password = db.Column(db.String(500))
+    info = db.Column(db.String(70))
+    date_registration = db.Column(db.DateTime, default=str(datetime.now())[:10])
+    # theme =
+    photo = db.Column(db.BLOB, nullable=True)
+
+
+class Chat(db.Model):
+    __tablename__ = 'Чат'
+    chat_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    chat_name = db.Column(db.String(32))
+    chat_description = db.Column(db.String(70))
+    chat_creator = db.Column(db.String(320), db.ForeignKey('Пользователь.email'))
+
+    # Для получения доступа к связанным объектам
+    cats = db.relationship('User', secondary=chat_user, backref=db.backref('tasks', lazy='dynamic'))
+
+
+class Message(db.Model):
+    __tablename__ = 'Сообщение'
+    message_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    chat_id = db.Column(db.Integer, db.ForeignKey('Чат.chat_id'))
+    message_sender = db.Column(db.String(320), db.ForeignKey('Пользователь.email'))
+    message_content = db.Column(db.String(120))
+    message_date_sent = db.Column(db.DateTime, default=str(datetime.now())[:19])
+    message_status = db.Column(db.Integer, default=0)
 
 
 @login_manager.user_loader
@@ -31,7 +73,7 @@ def load_user(user_id):
 def logout():
 
     logout_user()
-    return redirect(url_for('login'))
+    return redirect(url_for('authorization'))
 
 
 # region Проверки полей
@@ -113,8 +155,8 @@ def registration():
         isValidPassword(error, not_error, request.form['reg_password'], request.form['confirm_password'])
 
         sql = text("select count(*) from 'Пользователь' where email=='{}'".format(request.form['reg_email'].lower()))
-        user = db.engine.execute(sql)
-        isValidUser(error, user)
+        user = [row for row in db.engine.execute(sql)]
+        isValidUser(error, user[0][0])
 
         if not error:
             sql = text("INSERT INTO 'Пользователь' (email, name, telephone, login, password, info, date_registration) "
@@ -127,6 +169,36 @@ def registration():
                                                                                    datetime.utcnow()))
             print('Запрос был оформлен')
             db.engine.execute(sql)
+
+            sql = text("select p1.email, p2.email "
+                       "from 'Пользователь' p1 inner join 'Пользователь' p2 "
+                       "    on p1.email !=p2.email and p1.email == '{}'".format(request.form['reg_email'].lower()))
+
+            table = [row for row in db.engine.execute(sql)]
+            for row in table:
+                try:
+                    user1, user2 = row
+                    #sql_chat = text("insert into 'Чат' (chat_name, chat_description, chat_creator) VALUES (user2, 'friend', user1)")
+                    #db.engine.execute(sql)
+
+                    #sql_new_chat = text("select * from 'Чат' where chat_name=='{}' and chat_creator=='{}'".format(user2, user1))
+                    #new_chat = db.engine.execute(sql_new_chat)
+
+                    user_in_db = db.session.query(User).filter_by(email=user1).first()
+                    user_in_db_2 = db.session.query(User).filter_by(email=user2).first()
+
+                    chat = Chat(chat_name=user2, chat_description='friend', chat_creator=user1)
+                    chat.cats.append(user_in_db)
+                    chat.cats.append(user_in_db_2)
+                    db.session.add(chat)
+                    db.session.flush()
+                except:
+                    # Если были ошибки, то откатываемся назад
+                    db.session.rollback()
+                    print("Ошибка добавления в БД")
+                # Сохраняем изменения в таблице
+                db.session.commit()
+
 
             return redirect(url_for('authorization'))
         else:
@@ -153,8 +225,10 @@ def authorization():
 
         if check_password_hash(password, request.form['password']):
             load_user(email)
-            # Тут должна быть страница после авторизации
-            # return render_template('test.html', title='test')
+
+            sql = text('')
+
+            return render_template('HomePage.html', title='HomePage')
         else:
             return render_template('Authorization.html', title='Authorization', message='Ошибка ввода данных')
 
