@@ -88,6 +88,7 @@ class User(db.Model, UserMixin):
     def repr(self):
         return '<User $r>' % self.id
 
+
 class Chat(db.Model):
     __tablename__ = 'Чат'
     chat_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -282,7 +283,7 @@ def authorization():
 @app.route('/HomePage', methods=['GET', 'POST'])
 def homepage():
 
-    sql = text("select email, message_content, message_date_sent "
+    sql = text("select chat_id, email, message_content, message_date_sent "
                "from (select * "
                "from (select ch.chat_id, email "
                "from (select chat_id "
@@ -295,12 +296,47 @@ def homepage():
 
     for count, row in enumerate(chat):
         row = list(row)
-        if row[2] is not None:
-            row[2] = str(datetime.fromtimestamp(int(str(row[2])[0:10]) - 10800))[11:16]
+        if row[3] is not None:
+            row[3] = str(datetime.fromtimestamp(int(str(row[3])[0:10]) - 10800))[11:16]
 
         chat[count] = tuple(row)
 
-    return render_template('HomePage.html', title='HemoPage', message=chat)
+    if request.method == "POST":
+
+        chat_id = request.args.get('chat_id', 1, type=int)
+
+        sql = text("UPDATE Сообщение "
+                   "set message_status = 1 "
+                   "where chat_id == '{}' and message_sender!='{}'".format(chat_id, current_user.id))
+
+        db.engine.execute(sql)
+
+        sql = text("select * "
+                   "from Сообщение "
+                   "where chat_id == '{}' "
+                   "order by message_date_sent desc".format(chat_id))
+
+        message_chat = [row for row in db.engine.execute(sql)]
+
+        sql = text("select email "
+                   "from Список Участников Чата "
+                   "where chat_id=='{}' and email!='{}'".format(chat_id, current_user.email))
+
+        chat_name = db.engine.execute(sql)
+
+        return redirect(url_for('homepage', myChat=chat, name=chat_name, message=message_chat))
+
+    return render_template('HomePage.html', title='HomePage', myChat=chat)
+
+@app.route('/DelMessage', methods=['GET', 'POST'])
+def del_message():
+
+    content = request.form['content_message']
+
+    sql = text("INSERT INTO Сообщение (chat_id, message_sender, message_content, message_date_sent, message_status) "
+               "VALUES ('{}')".format(chat_id, current_user.id, content, datetime.utcnow(), 0))
+    db.engine.execute(sql)
+
 
 
 #Обработчик удаления аватара пользователя

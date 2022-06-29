@@ -157,23 +157,26 @@
             <div class="Chats my-3" style="overflow-y: scroll;">
 
                 <!-- Чат 1 -->
-                {% for item in message %}
-                    <div class="Chat px-3 d-flex flex-row align-items-center justify-content-between">
+                {% for item in myChat %}
+                    <form class="Chat px-3 d-flex flex-row align-items-center justify-content-between" method="POST" action="{{ url_for('homepage', chat_id=item[0]) }}" >
+                        <button>
                         <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">
                             <a href="/" class="me-2">
                                 <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"
                                      class="rounded-circle">
                             </a>
                             <div class="ChatInfo me-4 d-flex flex-column justify-content-center">
-                                <h6 class="m-0" style="color: white">{{ item[0] }}</h6>
-                                <p class="m-0 mt-1" style="font-size: small; color: white">{% if item[1] == None %}{{ 'пусто' }}{% else %}{{ item[1] }}{% endif %}</p>
+
+                                <h6 class="m-0" style="color: white">{{ item[1] }}</h6>
+                                <p class="m-0 mt-1" style="font-size: small; color: white">{% if item[2] == None %}{{ 'пусто' }}{% else %}{{ item[2] }}{% endif %}</p>
                             </div>
                         </div>
                         <div class="Time d-flex justify-content-center align-items-start">
-                            <p style="color: white">{% if item[2] == None %}{{ '' }}{% else %}{{ item[2] }}{% endif %}</p>
+                            <p style="color: white">{% if item[3] == None %}{{ '' }}{% else %}{{ item[3] }}{% endif %}</p>
                         </div>
+                        </button>
 
-                    </div>
+                    </form>
                 {% endfor %}
 
 {#                <!-- Чат 2 -->#}
@@ -328,6 +331,7 @@
         <div class="MessageBody vh-100 justify-content-between d-flex flex-column flex-fill">
 
             <!-- region Информация о чате -->
+
                 <div class="MessageInfo py-3 ps-3 d-flex flex-row align-items-center justify-content-between" style="background-color: #470323;">
                     <h5 class="m-0 p-0" style="color: white;">ChatName</h5>
                     <button class="d-flex me-2 align-items-center justify-content-center" data-bs-toggle="dropdown" aria-expanded="false" style="border: none; outline: none; background-color: inherit">
