@@ -36,13 +36,13 @@
                             <div class="modal-content">
 
                                 <div class="modal-header d-flex flex-column justify-content-center align-items-center">
-                                    <a href="/" class=""><img src="/static/images/Avatar.png" alt="Avatar"
+                                    <img src="{{ url_for('useravatar') }}" alt="Avatar"
                                                                   width="100" height="100"
                                                                   class="rounded-circle">
-                                    </a>
+
                                     <div class="UserInfo my-3 d-flex flex-column justify-content-center align-items-center">
-                                        <h4 class="m-0 mb-1">UserName</h4>
-                                        <p class="m-0 mt-1" style="font-size: smaller">UserEmail</p>
+                                        <h4 class="m-0 mb-1">{{ current_user.name }}</h4>
+                                        <p class="m-0 mt-1" style="font-size: smaller">{{ current_user.email }}</p>
                                     </div>
                                 </div>
 
@@ -154,170 +154,172 @@
             <!-- endregion -->
 
             <!-- region Чаты и диалоги -->
-                <div class="Chats my-3" style="overflow-y: scroll;">
+            <div class="Chats my-3" style="overflow-y: scroll;">
 
                 <!-- Чат 1 -->
-                <div class="Chat px-3 d-flex flex-row align-items-center justify-content-between">
-                    <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">
-                        <a href="/" class="me-2">
-                            <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"
-                                 class="rounded-circle">
-                        </a>
-                        <div class="ChatInfo me-4 d-flex flex-column justify-content-center">
-                            <h6 class="m-0" style="color: white">ChatName 1</h6>
-                            <p class="m-0 mt-1" style="font-size: small; color: white">Latest message in chat</p>
+                {% for item in message %}
+                    <div class="Chat px-3 d-flex flex-row align-items-center justify-content-between">
+                        <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">
+                            <a href="/" class="me-2">
+                                <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"
+                                     class="rounded-circle">
+                            </a>
+                            <div class="ChatInfo me-4 d-flex flex-column justify-content-center">
+                                <h6 class="m-0" style="color: white">{{ item[0] }}</h6>
+                                <p class="m-0 mt-1" style="font-size: small; color: white">{% if item[1] == None %}{{ 'пусто' }}{% else %}{{ item[1] }}{% endif %}</p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="Time d-flex justify-content-center align-items-start">
-                        <p style="color: white">00:00</p>
-                    </div>
-
-                </div>
-
-                <!-- Чат 2 -->
-                <div class="Chat px-3 my-3 d-flex flex-row align-items-center justify-content-between">
-                    <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">
-                        <a href="/" class="me-2">
-                            <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"
-                                 class="rounded-circle">
-                        </a>
-                        <div class="ChatInfo me-4 d-flex flex-column justify-content-center">
-                            <h6 class="m-0" style="color: white">ChatName 2</h6>
-                            <p class="m-0 mt-1" style="font-size: small; color: white">Latest message in chat</p>
+                        <div class="Time d-flex justify-content-center align-items-start">
+                            <p style="color: white">{% if item[2] == None %}{{ '' }}{% else %}{{ item[2] }}{% endif %}</p>
                         </div>
-                    </div>
-                    <div class="Time d-flex justify-content-center align-items-start">
-                        <p style="color: white">00:00</p>
-                    </div>
 
-                </div>
-
-                <!-- Чат 3 -->
-                <div class="Chat px-3 my-3 d-flex flex-row align-items-center justify-content-between">
-                    <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">
-                        <a href="/" class="me-2">
-                            <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"
-                                 class="rounded-circle">
-                        </a>
-                        <div class="ChatInfo me-4 d-flex flex-column justify-content-center">
-                            <h6 class="m-0" style="color: white">ChatName 3</h6>
-                            <p class="m-0 mt-1" style="font-size: small; color: white">Latest message in chat</p>
-                        </div>
                     </div>
-                    <div class="Time d-flex justify-content-center align-items-start">
-                        <p style="color: white">00:00</p>
-                    </div>
+                {% endfor %}
 
-                </div>
-
-                <!-- Чат 4 -->
-                <div class="Chat px-3 my-3 d-flex flex-row align-items-center justify-content-between">
-                    <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">
-                        <a href="/" class="me-2">
-                            <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"
-                                 class="rounded-circle">
-                        </a>
-                        <div class="ChatInfo me-4 d-flex flex-column justify-content-center">
-                            <h6 class="m-0" style="color: white">ChatName 4</h6>
-                            <p class="m-0 mt-1" style="font-size: small; color: white">Latest message in chat</p>
-                        </div>
-                    </div>
-                    <div class="Time d-flex justify-content-center align-items-start">
-                        <p style="color: white">00:00</p>
-                    </div>
-
-                </div>
-
-                <!-- Чат 5 -->
-                <div class="Chat px-3 my-3 d-flex flex-row align-items-center justify-content-between">
-                    <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">
-                        <a href="/" class="me-2">
-                            <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"
-                                 class="rounded-circle">
-                        </a>
-                        <div class="ChatInfo me-4 d-flex flex-column justify-content-center">
-                            <h6 class="m-0" style="color: white">ChatName 5</h6>
-                            <p class="m-0 mt-1" style="font-size: small; color: white">Latest message in chat</p>
-                        </div>
-                    </div>
-                    <div class="Time d-flex justify-content-center align-items-start">
-                        <p style="color: white">00:00</p>
-                    </div>
-
-                </div>
-
-                <!-- Чат 6 -->
-                <div class="Chat px-3 my-3 d-flex flex-row align-items-center justify-content-between">
-                    <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">
-                        <a href="/" class="me-2">
-                            <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"
-                                 class="rounded-circle">
-                        </a>
-                        <div class="ChatInfo me-4 d-flex flex-column justify-content-center">
-                            <h6 class="m-0" style="color: #BFAE1F">ChatName 6</h6>
-                            <p class="m-0 mt-1" style="font-size: small; color: #BFAE1F">Latest message in chat</p>
-                        </div>
-                    </div>
-                    <div class="Time d-flex justify-content-center align-items-start">
-                        <p style="color: #BFAE1F">00:00</p>
-                    </div>
-
-                </div>
-
-                <!-- Чат 7 -->
-                <div class="Chat px-3 my-3 d-flex flex-row align-items-center justify-content-between" style="background-color: #8C4164">
-                    <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">
-                        <a href="/" class="me-2">
-                            <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"
-                                 class="rounded-circle">
-                        </a>
-                        <div class="ChatInfo me-4 d-flex flex-column justify-content-center">
-                            <h6 class="m-0" style="color: white">ChatName 7</h6>
-                            <p class="m-0 mt-1" style="font-size: small; color: white">Latest message in chat</p>
-                        </div>
-                    </div>
-                    <div class="Time d-flex justify-content-center align-items-start">
-                        <p style="color: white">00:00</p>
-                    </div>
-
-                </div>
-
-                <!-- Чат 8 -->
-                <div class="Chat px-3 my-3 d-flex flex-row align-items-center justify-content-between" style="background-color: #8C4164">
-                    <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">
-                        <a href="/" class="me-2">
-                            <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"
-                                 class="rounded-circle">
-                        </a>
-                        <div class="ChatInfo me-4 d-flex flex-column justify-content-center">
-                            <h6 class="m-0" style="color: #BFAE1F">ChatName 8</h6>
-                            <p class="m-0 mt-1" style="font-size: small; color: #BFAE1F">Latest message in chat</p>
-                        </div>
-                    </div>
-                    <div class="Time d-flex justify-content-center align-items-start">
-                        <p style="color: #BFAE1F">00:00</p>
-                    </div>
-
-                </div>
-
-                <!-- Чат 9 -->
-                <div class="Chat px-3 d-flex flex-row align-items-center justify-content-between" style="background-color: #BFAE1F">
-                    <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">
-                        <a href="/" class="me-2">
-                            <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"
-                                 class="rounded-circle">
-                        </a>
-                        <div class="ChatInfo me-4 d-flex flex-column justify-content-center">
-                            <h6 class="m-0" style="color: white">ChatName 9</h6>
-                            <p class="m-0 mt-1" style="font-size: small; color: white">Latest message in chat</p>
-                        </div>
-                    </div>
-                    <div class="Time d-flex justify-content-center align-items-start">
-                        <p style="color: white">00:00</p>
-                    </div>
-
-                </div>
-
+{#                <!-- Чат 2 -->#}
+{#                <div class="Chat px-3 my-3 d-flex flex-row align-items-center justify-content-between">#}
+{#                    <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">#}
+{#                        <a href="/" class="me-2">#}
+{#                            <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"#}
+{#                                 class="rounded-circle">#}
+{#                        </a>#}
+{#                        <div class="ChatInfo me-4 d-flex flex-column justify-content-center">#}
+{#                            <h6 class="m-0" style="color: white">ChatName 2</h6>#}
+{#                            <p class="m-0 mt-1" style="font-size: small; color: white">Latest message in chat</p>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <div class="Time d-flex justify-content-center align-items-start">#}
+{#                        <p style="color: white">00:00</p>#}
+{#                    </div>#}
+{##}
+{#                </div>#}
+{##}
+{#                <!-- Чат 3 -->#}
+{#                <div class="Chat px-3 my-3 d-flex flex-row align-items-center justify-content-between">#}
+{#                    <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">#}
+{#                        <a href="/" class="me-2">#}
+{#                            <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"#}
+{#                                 class="rounded-circle">#}
+{#                        </a>#}
+{#                        <div class="ChatInfo me-4 d-flex flex-column justify-content-center">#}
+{#                            <h6 class="m-0" style="color: white">ChatName 3</h6>#}
+{#                            <p class="m-0 mt-1" style="font-size: small; color: white">Latest message in chat</p>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <div class="Time d-flex justify-content-center align-items-start">#}
+{#                        <p style="color: white">00:00</p>#}
+{#                    </div>#}
+{##}
+{#                </div>#}
+{##}
+{#                <!-- Чат 4 -->#}
+{#                <div class="Chat px-3 my-3 d-flex flex-row align-items-center justify-content-between">#}
+{#                    <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">#}
+{#                        <a href="/" class="me-2">#}
+{#                            <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"#}
+{#                                 class="rounded-circle">#}
+{#                        </a>#}
+{#                        <div class="ChatInfo me-4 d-flex flex-column justify-content-center">#}
+{#                            <h6 class="m-0" style="color: white">ChatName 4</h6>#}
+{#                            <p class="m-0 mt-1" style="font-size: small; color: white">Latest message in chat</p>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <div class="Time d-flex justify-content-center align-items-start">#}
+{#                        <p style="color: white">00:00</p>#}
+{#                    </div>#}
+{##}
+{#                </div>#}
+{##}
+{#                <!-- Чат 5 -->#}
+{#                <div class="Chat px-3 my-3 d-flex flex-row align-items-center justify-content-between">#}
+{#                    <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">#}
+{#                        <a href="/" class="me-2">#}
+{#                            <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"#}
+{#                                 class="rounded-circle">#}
+{#                        </a>#}
+{#                        <div class="ChatInfo me-4 d-flex flex-column justify-content-center">#}
+{#                            <h6 class="m-0" style="color: white">ChatName 5</h6>#}
+{#                            <p class="m-0 mt-1" style="font-size: small; color: white">Latest message in chat</p>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <div class="Time d-flex justify-content-center align-items-start">#}
+{#                        <p style="color: white">00:00</p>#}
+{#                    </div>#}
+{##}
+{#                </div>#}
+{##}
+{#                <!-- Чат 6 -->#}
+{#                <div class="Chat px-3 my-3 d-flex flex-row align-items-center justify-content-between">#}
+{#                    <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">#}
+{#                        <a href="/" class="me-2">#}
+{#                            <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"#}
+{#                                 class="rounded-circle">#}
+{#                        </a>#}
+{#                        <div class="ChatInfo me-4 d-flex flex-column justify-content-center">#}
+{#                            <h6 class="m-0" style="color: #BFAE1F">ChatName 6</h6>#}
+{#                            <p class="m-0 mt-1" style="font-size: small; color: #BFAE1F">Latest message in chat</p>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <div class="Time d-flex justify-content-center align-items-start">#}
+{#                        <p style="color: #BFAE1F">00:00</p>#}
+{#                    </div>#}
+{##}
+{#                </div>#}
+{##}
+{#                <!-- Чат 7 -->#}
+{#                <div class="Chat px-3 my-3 d-flex flex-row align-items-center justify-content-between" style="background-color: #8C4164">#}
+{#                    <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">#}
+{#                        <a href="/" class="me-2">#}
+{#                            <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"#}
+{#                                 class="rounded-circle">#}
+{#                        </a>#}
+{#                        <div class="ChatInfo me-4 d-flex flex-column justify-content-center">#}
+{#                            <h6 class="m-0" style="color: white">ChatName 7</h6>#}
+{#                            <p class="m-0 mt-1" style="font-size: small; color: white">Latest message in chat</p>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <div class="Time d-flex justify-content-center align-items-start">#}
+{#                        <p style="color: white">00:00</p>#}
+{#                    </div>#}
+{##}
+{#                </div>#}
+{##}
+{#                <!-- Чат 8 -->#}
+{#                <div class="Chat px-3 my-3 d-flex flex-row align-items-center justify-content-between" style="background-color: #8C4164">#}
+{#                    <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">#}
+{#                        <a href="/" class="me-2">#}
+{#                            <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"#}
+{#                                 class="rounded-circle">#}
+{#                        </a>#}
+{#                        <div class="ChatInfo me-4 d-flex flex-column justify-content-center">#}
+{#                            <h6 class="m-0" style="color: #BFAE1F">ChatName 8</h6>#}
+{#                            <p class="m-0 mt-1" style="font-size: small; color: #BFAE1F">Latest message in chat</p>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <div class="Time d-flex justify-content-center align-items-start">#}
+{#                        <p style="color: #BFAE1F">00:00</p>#}
+{#                    </div>#}
+{##}
+{#                </div>#}
+{##}
+{#                <!-- Чат 9 -->#}
+{#                <div class="Chat px-3 d-flex flex-row align-items-center justify-content-between" style="background-color: #BFAE1F">#}
+{#                    <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">#}
+{#                        <a href="/" class="me-2">#}
+{#                            <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"#}
+{#                                 class="rounded-circle">#}
+{#                        </a>#}
+{#                        <div class="ChatInfo me-4 d-flex flex-column justify-content-center">#}
+{#                            <h6 class="m-0" style="color: white">ChatName 9</h6>#}
+{#                            <p class="m-0 mt-1" style="font-size: small; color: white">Latest message in chat</p>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <div class="Time d-flex justify-content-center align-items-start">#}
+{#                        <p style="color: white">00:00</p>#}
+{#                    </div>#}
+{##}
+{#                </div>#}
+{##}
             </div>
             <!-- endregion -->
 

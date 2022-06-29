@@ -2,8 +2,9 @@ from flask import Flask, url_for, redirect, session, render_template, request, f
 
 from myConfig import Config
 from flask_sqlalchemy import SQLAlchemy
-#from flask_migrate import Migrate
-from flask_login import LoginManager, UserMixin, current_user, logout_user, login_required
+from flask_migrate import Migrate
+from sqlalchemy.sql.functions import current_user
+from flask_login import LoginManager, UserMixin, logout_user, login_required, login_user
 import phonenumbers
 import re
 from datetime import datetime
@@ -16,7 +17,7 @@ app.config.from_object(Config)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///coopNet.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-#migrate = Migrate(app, db)
+migrate = Migrate(app, db)
 login_manager = LoginManager(app)
 
 
@@ -29,7 +30,8 @@ chat_user = db.Table(
 
 class User(db.Model, UserMixin):
     __tablename__ = 'Пользователь'
-    email = db.Column(db.String(320), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    email = db.Column(db.String(320), unique=True)
     name = db.Column(db.String(60))
     telephone = db.Column(db.String(15), unique=True)
     login = db.Column(db.String(32), unique=True)
@@ -83,6 +85,8 @@ class User(db.Model, UserMixin):
             return False
         return True
 
+    def repr(self):
+        return '<User $r>' % self.id
 
 class Chat(db.Model):
     __tablename__ = 'Чат'
@@ -109,7 +113,7 @@ class Message(db.Model):
 def load_user(user_id):
 
     session['user'] = user_id
-    # return User.query.get(user_id)
+    return User.query.get(user_id)
 
 
 @app.route('/logout')
@@ -222,16 +226,11 @@ def registration():
             for row in table:
                 try:
                     user1, user2 = row
-                    #sql_chat = text("insert into 'Чат' (chat_name, chat_description, chat_creator) VALUES (user2, 'friend', user1)")
-                    #db.engine.execute(sql)
-
-                    #sql_new_chat = text("select * from 'Чат' where chat_name=='{}' and chat_creator=='{}'".format(user2, user1))
-                    #new_chat = db.engine.execute(sql_new_chat)
 
                     user_in_db = db.session.query(User).filter_by(email=user1).first()
                     user_in_db_2 = db.session.query(User).filter_by(email=user2).first()
 
-                    chat = Chat(chat_name=user2, chat_description='friend', chat_creator=user1)
+                    chat = Chat(chat_name=None, chat_description='friend', chat_creator=user1)
                     chat.cats.append(user_in_db)
                     chat.cats.append(user_in_db_2)
                     db.session.add(chat)
@@ -268,11 +267,12 @@ def authorization():
             return render_template('Authorization.html', title='Authorization', message='Ошибка ввода данных')
 
         if check_password_hash(password, request.form['password']):
+            user = User.query.filter_by(email=request.form['email'].lower()).first()
             load_user(email)
+            login_user(user)
 
-            sql = text('')
+            return redirect(url_for('homepage'))
 
-            return render_template('HomePage.html', title='HomePage')
         else:
             return render_template('Authorization.html', title='Authorization', message='Ошибка ввода данных')
 
@@ -281,7 +281,26 @@ def authorization():
 
 @app.route('/HomePage', methods=['GET', 'POST'])
 def homepage():
-    return render_template('HomePage.html')
+
+    sql = text("select email, message_content, message_date_sent "
+               "from (select * "
+               "from (select ch.chat_id, email "
+               "from (select chat_id "
+               "from 'Список Участников Чата' "
+               "where email=='{0}') ch inner join 'Список Участников Чата' ch2 on ch.chat_id ==ch2.chat_id "
+               "where email != '{0}') ch left outer join Сообщение c on ch.chat_id = c.chat_id "
+               "order by message_date_sent desc) t "
+               "group by t.chat_id".format(session['user']))
+    chat = [row for row in db.engine.execute(sql)]
+
+    for count, row in enumerate(chat):
+        row = list(row)
+        if row[2] is not None:
+            row[2] = str(datetime.fromtimestamp(int(str(row[2])[0:10]) - 10800))[11:16]
+
+        chat[count] = tuple(row)
+
+    return render_template('HomePage.html', title='HemoPage', message=chat)
 
 
 #Обработчик удаления аватара пользователя
@@ -324,10 +343,10 @@ def upload():
                 flash('Аватар успешно обновлен', 'success')
             except FileNotFoundError as e:
                 flash('Ошибка обновления аватара', 'error')
-                return redirect(url_for('index'))
-        return redirect(f'/Profile/{current_user.id}')
+                return redirect(url_for('homepage'))
+        return redirect(url_for('homepage'))
     else:
-        return redirect(f'/Profile/{current_user.id}')
+        return redirect(url_for('homepage'))
 
 
 @app.route('/deletemessage', methods=['POST', 'GET'])
@@ -340,6 +359,7 @@ def deletemessage():
     except:
         flash('Ошибка удаления сообщения')
     return redirect(url_for('homepage'))
+
 
 if __name__ == '__main__':
     app.run(debug=True)
