@@ -12,6 +12,11 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.3/font/bootstrap-icons.css">
+    <style>
+        ::-webkit-scrollbar {
+            width: 0;
+        }
+    </style>
 </head>
 
 <body>
@@ -39,10 +44,9 @@
                                     <img src="{{ url_for('useravatar') }}" alt="Avatar"
                                                                   width="100" height="100"
                                                                   class="rounded-circle">
-
                                     <div class="UserInfo my-3 d-flex flex-column justify-content-center align-items-center">
-                                        <h4 class="m-0 mb-1">{{ current_user.name }}</h4>
-                                        <p class="m-0 mt-1" style="font-size: smaller">{{ current_user.email }}</p>
+                                        <h4 class="m-0 mb-1">{{ user.name }}</h4>
+                                        <p class="m-0 mt-1" style="font-size: smaller">{{ user.email }}</p>
                                     </div>
                                 </div>
 
@@ -92,375 +96,248 @@
                  <!-- endregion -->
 
                 <!-- region Модальное окно смены фото профиля -->
-                                        <div class="modal fade" id="ChangePhotoModal" tabindex="-1" aria-labelledby="ChangePhotoModalLabel"
-                                             aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-                                                <div class="modal-content">
+                    <div class="modal fade" id="ChangePhotoModal" tabindex="-1" aria-labelledby="ChangePhotoModalLabel"
+                         aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                            <div class="modal-content">
 
-                                                    <div class="modal-header d-flex justify-content-center align-items-center">
-                                                        <h5 class="modal-title me-2" id="InterlocutorModalLabel">Фото профиля</h5>
-                                                    </div>
+                                <div class="modal-header d-flex justify-content-center align-items-center">
+                                    <h5 class="modal-title me-2" id="InterlocutorModalLabel">Фото профиля</h5>
+                                </div>
 
-                                                    <div class="modal-body d-flex flex-column align-items-center justify-content-center">
+                                <div class="modal-body d-flex flex-column align-items-center justify-content-center">
 
-                                                        <!-- Profile picture image-->
-                                                        <div class="d-flex flex-column align-items-center">
-                                                            <img class="img-account-profile rounded-circle mb-2"
-                                                                 src="{{ url_for('useravatar') }}" alt="" width="315"
-                                                                 height="315">
-                                                            <a href="{{ url_for('removeavatar') }}" class="text-danger"
-                                                               style="text-decoration: none;">Удалить фото профиля?</a>
-                                                        </div>
-                                                        <!-- Profile picture help block-->
-                                                        <div class="small font-italic text-muted mb-2 mt-4">Размер фото
-                                                            не более 5 MB
-                                                        </div>
-                                                        <form action="{{ url_for('upload') }}" method="post"
-                                                              enctype="multipart/form-data" class="d-flex flex-row">
-                                                            <div class="text-center me-2">
-                                                                <input name="file" type="file" id="file"
-                                                                       class="input input__file"
-                                                                       style="opacity: 0; visibility: hidden; position: absolute;">
-                                                                <label for="file"
-                                                                       class="input__file-button border border-primary p-2"
-                                                                       style="border-radius: 10px">
-                                                                    <span class="input__file-icon-wrapper mr-1 text-primary">
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="25" fill="currentColor"
-                                                                             class="bi bi-upload input__file-icon" viewBox="0 0 16 16">
-                                                                            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-                                                                            <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
-                                                                        </svg>
-                                                                    </span>
-                                                                    <span class="input__file-button-text text-primary">Выберите файл</span>
-                                                                </label>
-                                                            </div>
-                                                            <input type="submit" class="btn btn-primary"
-                                                                   value="Загрузить">
-                                                        </form>
-
-                                                    </div>
-
-                                                    <div class="modal-footer d-flex justify-content-start">
-                                                        <p class="text-secondary" style="font-size: smaller">Company name</p>
-                                                    </div>
-
-                                                </div>
-                                            </div>
+                                    <!-- Profile picture image-->
+                                    <div class="d-flex flex-column align-items-center">
+                                        <img class="img-account-profile rounded-circle mb-2"
+                                             src="{{ url_for('useravatar') }}" alt="" width="315"
+                                             height="315">
+                                        <a href="{{ url_for('removeavatar') }}" class="text-danger"
+                                           style="text-decoration: none;">Удалить фото профиля?</a>
+                                    </div>
+                                    <!-- Profile picture help block-->
+                                    <div class="small font-italic text-muted mb-2 mt-4">Размер фото
+                                        не более 5 MB
+                                    </div>
+                                    <form action="{{ url_for('upload') }}" method="post"
+                                          enctype="multipart/form-data" class="d-flex flex-row">
+                                        <div class="text-center me-2">
+                                            <input name="file" type="file" id="file"
+                                                   class="input input__file"
+                                                   style="opacity: 0; visibility: hidden; position: absolute;">
+                                            <label for="file"
+                                                   class="input__file-button border border-primary p-2"
+                                                   style="border-radius: 10px">
+                                                <span class="input__file-icon-wrapper mr-1 text-primary">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="25" fill="currentColor"
+                                                         class="bi bi-upload input__file-icon" viewBox="0 0 16 16">
+                                                        <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                                                        <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
+                                                    </svg>
+                                                </span>
+                                                <span class="input__file-button-text text-primary">Выберите файл</span>
+                                            </label>
                                         </div>
-                                    <!-- endregion -->
+                                        <input type="submit" class="btn btn-primary"
+                                               value="Загрузить">
+                                    </form>
+
+                                </div>
+
+                                <div class="modal-footer d-flex justify-content-start">
+                                    <p class="text-secondary" style="font-size: smaller">Company name</p>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                <!-- endregion -->
 
                 <input type="search" name="q" class="form-control" value="" placeholder="Search..." aria-label="Search">
             </div>
             <!-- endregion -->
 
             <!-- region Чаты и диалоги -->
-            <div class="Chats my-3" style="overflow-y: scroll;">
+                <div class="Chats my-3" style="overflow-y: scroll;">
 
-                <!-- Чат 1 -->
+
+                <!-- Чат -->
                 {% for item in myChat %}
-                    <form class="Chat px-3 d-flex flex-row align-items-center justify-content-between" method="POST" action="{{ url_for('homepage', chat_id=item[0]) }}" >
-                        <button>
-                        <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">
-                            <a href="/" class="me-2">
-                                <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"
-                                     class="rounded-circle">
-                            </a>
-                            <div class="ChatInfo me-4 d-flex flex-column justify-content-center">
+                    <form method="POST" action="{{ url_for('homepage', chat_id=item[0]) }}">
+                        <button class="Chat px-3 d-flex flex-row align-items-center justify-content-between" style="border: none; outline: none; background-color: inherit">
+                            <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">
+                                <a href="/" class="me-2">
+                                    <img src="{{ url_for('getuseravatar', useremail=item[1]) }}" alt="Avatar" width="55" height="55"
+                                         class="rounded-circle">
+                                </a>
+                                <div class="ChatInfo me-4 d-flex flex-column justify-content-center align-items-start">
 
-                                <h6 class="m-0" style="color: white">{{ item[1] }}</h6>
-                                <p class="m-0 mt-1" style="font-size: small; color: white">{% if item[2] == None %}{{ 'пусто' }}{% else %}{{ item[2] }}{% endif %}</p>
+                                    <h6 class="m-0" style="color: white">{{ item[1] }}</h6>
+                                    <p class="m-0 mt-1" style="font-size: small; color: white">
+                                        {% if item[2] == None %}{{ 'пусто' }}{% else %}{{ item[2] }}{% endif %}</p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="Time d-flex justify-content-center align-items-start">
-                            <p style="color: white">{% if item[3] == None %}{{ '' }}{% else %}{{ item[3] }}{% endif %}</p>
-                        </div>
+                            <div class="Time d-flex justify-content-center align-items-start">
+                                <p style="color: white">
+                                    {% if item[3] == None %}{{ '' }}{% else %}{{ item[3] }}{% endif %}</p>
+                            </div>
                         </button>
-
                     </form>
                 {% endfor %}
 
-{#                <!-- Чат 2 -->#}
-{#                <div class="Chat px-3 my-3 d-flex flex-row align-items-center justify-content-between">#}
-{#                    <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">#}
-{#                        <a href="/" class="me-2">#}
-{#                            <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"#}
-{#                                 class="rounded-circle">#}
-{#                        </a>#}
-{#                        <div class="ChatInfo me-4 d-flex flex-column justify-content-center">#}
-{#                            <h6 class="m-0" style="color: white">ChatName 2</h6>#}
-{#                            <p class="m-0 mt-1" style="font-size: small; color: white">Latest message in chat</p>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                    <div class="Time d-flex justify-content-center align-items-start">#}
-{#                        <p style="color: white">00:00</p>#}
-{#                    </div>#}
-{##}
-{#                </div>#}
-{##}
-{#                <!-- Чат 3 -->#}
-{#                <div class="Chat px-3 my-3 d-flex flex-row align-items-center justify-content-between">#}
-{#                    <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">#}
-{#                        <a href="/" class="me-2">#}
-{#                            <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"#}
-{#                                 class="rounded-circle">#}
-{#                        </a>#}
-{#                        <div class="ChatInfo me-4 d-flex flex-column justify-content-center">#}
-{#                            <h6 class="m-0" style="color: white">ChatName 3</h6>#}
-{#                            <p class="m-0 mt-1" style="font-size: small; color: white">Latest message in chat</p>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                    <div class="Time d-flex justify-content-center align-items-start">#}
-{#                        <p style="color: white">00:00</p>#}
-{#                    </div>#}
-{##}
-{#                </div>#}
-{##}
-{#                <!-- Чат 4 -->#}
-{#                <div class="Chat px-3 my-3 d-flex flex-row align-items-center justify-content-between">#}
-{#                    <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">#}
-{#                        <a href="/" class="me-2">#}
-{#                            <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"#}
-{#                                 class="rounded-circle">#}
-{#                        </a>#}
-{#                        <div class="ChatInfo me-4 d-flex flex-column justify-content-center">#}
-{#                            <h6 class="m-0" style="color: white">ChatName 4</h6>#}
-{#                            <p class="m-0 mt-1" style="font-size: small; color: white">Latest message in chat</p>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                    <div class="Time d-flex justify-content-center align-items-start">#}
-{#                        <p style="color: white">00:00</p>#}
-{#                    </div>#}
-{##}
-{#                </div>#}
-{##}
-{#                <!-- Чат 5 -->#}
-{#                <div class="Chat px-3 my-3 d-flex flex-row align-items-center justify-content-between">#}
-{#                    <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">#}
-{#                        <a href="/" class="me-2">#}
-{#                            <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"#}
-{#                                 class="rounded-circle">#}
-{#                        </a>#}
-{#                        <div class="ChatInfo me-4 d-flex flex-column justify-content-center">#}
-{#                            <h6 class="m-0" style="color: white">ChatName 5</h6>#}
-{#                            <p class="m-0 mt-1" style="font-size: small; color: white">Latest message in chat</p>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                    <div class="Time d-flex justify-content-center align-items-start">#}
-{#                        <p style="color: white">00:00</p>#}
-{#                    </div>#}
-{##}
-{#                </div>#}
-{##}
-{#                <!-- Чат 6 -->#}
-{#                <div class="Chat px-3 my-3 d-flex flex-row align-items-center justify-content-between">#}
-{#                    <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">#}
-{#                        <a href="/" class="me-2">#}
-{#                            <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"#}
-{#                                 class="rounded-circle">#}
-{#                        </a>#}
-{#                        <div class="ChatInfo me-4 d-flex flex-column justify-content-center">#}
-{#                            <h6 class="m-0" style="color: #BFAE1F">ChatName 6</h6>#}
-{#                            <p class="m-0 mt-1" style="font-size: small; color: #BFAE1F">Latest message in chat</p>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                    <div class="Time d-flex justify-content-center align-items-start">#}
-{#                        <p style="color: #BFAE1F">00:00</p>#}
-{#                    </div>#}
-{##}
-{#                </div>#}
-{##}
-{#                <!-- Чат 7 -->#}
-{#                <div class="Chat px-3 my-3 d-flex flex-row align-items-center justify-content-between" style="background-color: #8C4164">#}
-{#                    <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">#}
-{#                        <a href="/" class="me-2">#}
-{#                            <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"#}
-{#                                 class="rounded-circle">#}
-{#                        </a>#}
-{#                        <div class="ChatInfo me-4 d-flex flex-column justify-content-center">#}
-{#                            <h6 class="m-0" style="color: white">ChatName 7</h6>#}
-{#                            <p class="m-0 mt-1" style="font-size: small; color: white">Latest message in chat</p>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                    <div class="Time d-flex justify-content-center align-items-start">#}
-{#                        <p style="color: white">00:00</p>#}
-{#                    </div>#}
-{##}
-{#                </div>#}
-{##}
-{#                <!-- Чат 8 -->#}
-{#                <div class="Chat px-3 my-3 d-flex flex-row align-items-center justify-content-between" style="background-color: #8C4164">#}
-{#                    <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">#}
-{#                        <a href="/" class="me-2">#}
-{#                            <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"#}
-{#                                 class="rounded-circle">#}
-{#                        </a>#}
-{#                        <div class="ChatInfo me-4 d-flex flex-column justify-content-center">#}
-{#                            <h6 class="m-0" style="color: #BFAE1F">ChatName 8</h6>#}
-{#                            <p class="m-0 mt-1" style="font-size: small; color: #BFAE1F">Latest message in chat</p>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                    <div class="Time d-flex justify-content-center align-items-start">#}
-{#                        <p style="color: #BFAE1F">00:00</p>#}
-{#                    </div>#}
-{##}
-{#                </div>#}
-{##}
-{#                <!-- Чат 9 -->#}
-{#                <div class="Chat px-3 d-flex flex-row align-items-center justify-content-between" style="background-color: #BFAE1F">#}
-{#                    <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">#}
-{#                        <a href="/" class="me-2">#}
-{#                            <img src="/static/images/Avatar.png" alt="Avatar" width="55" height="55"#}
-{#                                 class="rounded-circle">#}
-{#                        </a>#}
-{#                        <div class="ChatInfo me-4 d-flex flex-column justify-content-center">#}
-{#                            <h6 class="m-0" style="color: white">ChatName 9</h6>#}
-{#                            <p class="m-0 mt-1" style="font-size: small; color: white">Latest message in chat</p>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                    <div class="Time d-flex justify-content-center align-items-start">#}
-{#                        <p style="color: white">00:00</p>#}
-{#                    </div>#}
-{##}
-{#                </div>#}
-{##}
             </div>
             <!-- endregion -->
 
         </div>
 
         <div class="MessageBody vh-100 justify-content-between d-flex flex-column flex-fill">
+            {% if name == '' %}
+                <div class="Messages p-3 d-flex flex-fill align-items-center justify-content-center" style="background-color: #8C4164; overflow-y: scroll;">
+                    <div class="InformationMessage p-3 border d-flex align-items-center justify-content-center"
+                         style="border-radius: 10px; background-color: white;">
+                        <p class="m-0">Выберете, кому бы вы хотели написать</p>
+                    </div>
+                </div>
+            {% else %}
 
-            <!-- region Информация о чате -->
+                <!-- region Информация о чате -->
+                    <div class="MessageInfo py-3 ps-3 d-flex flex-row align-items-center justify-content-between" style="background-color: #470323;">
+                        <h5 class="m-0 p-0" style="color: white;">{{ name[0] }}</h5>
+                        <button class="d-flex me-2 align-items-center justify-content-center" data-bs-toggle="dropdown" aria-expanded="false" style="border: none; outline: none; background-color: inherit">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white"
+                                 class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
+                                <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                            </svg>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdown03">
+                            <li>
+                                <button class="dropdown-item d-flex align-items-center justify-content-start" data-bs-toggle="modal" data-bs-target="#interlocutorModal"
+                                        style="border: none; outline: none; background-color: inherit">
+                                   Профиль
+                                </button>
+                            </li>
+                        </ul>
+                        <!-- region Модальное окно профиля собеседника -->
+                                <div class="modal fade" id="interlocutorModal" tabindex="-1" aria-labelledby="InterlocutorModalLabel"
+                                     aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                                        <div class="modal-content">
 
-                <div class="MessageInfo py-3 ps-3 d-flex flex-row align-items-center justify-content-between" style="background-color: #470323;">
-                    <h5 class="m-0 p-0" style="color: white;">ChatName</h5>
-                    <button class="d-flex me-2 align-items-center justify-content-center" data-bs-toggle="dropdown" aria-expanded="false" style="border: none; outline: none; background-color: inherit">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white"
-                             class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
-                            <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
-                        </svg>
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdown03">
-                        <li>
-                            <button class="dropdown-item d-flex align-items-center justify-content-start" data-bs-toggle="modal" data-bs-target="#interlocutorModal"
-                                    style="border: none; outline: none; background-color: inherit">
-                               Профиль
-                            </button>
-                        </li>
-                    </ul>
-                    <!-- region Модальное окно профиля собеседника -->
-                            <div class="modal fade" id="interlocutorModal" tabindex="-1" aria-labelledby="InterlocutorModalLabel"
-                                 aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-                                    <div class="modal-content">
+                                            <div class="modal-header d-flex flex-column justify-content-center align-items-start">
 
-                                        <div class="modal-header d-flex flex-column justify-content-center align-items-start">
-
-                                            <div class="d-flex flex-row align-self-stretch justify-content-between align-items-center">
-                                                <h5 class="modal-title me-2" id="InterlocutorModalLabel">Информация</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                        aria-label="Close"></button>
-                                            </div>
-                                            <div class="ProfileNameInfo mt-3 d-flex flex-row align-items-center justify-conten-start">
-                                                <a href="/" class="me-3"><img src="/static/images/Avatar.png"
-                                                                          alt="Avatar"
-                                                                          width="100" height="100"
-                                                                          class="rounded-circle">
-                                                </a>
-                                                <div class="d-flex flex-column justify-content-center align-items-start">
-                                                    <h4 class="m-0 mb-1">UserName</h4>
-                                                    <p class="m-0 mt-1 text-secondary" style="font-size: smaller">name@example.com</p>
+                                                <div class="d-flex flex-row align-self-stretch justify-content-between align-items-center">
+                                                    <h5 class="modal-title me-2" id="InterlocutorModalLabel">Информация</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
                                                 </div>
-                                            </div>
-
-                                        </div>
-
-                                        <div class="modal-body">
-
-                                            <!-- Информация о телефоне собеседника -->
-                                            <div class="d-flex flex-row align-items-center justify-content-start" style="border: none; outline: none; background-color: inherit">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                                                     fill="currentColor" class="me-2 bi bi-telephone"
-                                                     viewBox="0 0 16 16">
-                                                    <path d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.568 17.568 0 0 0 4.168 6.608 17.569 17.569 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.678.678 0 0 0-.58-.122l-2.19.547a1.745 1.745 0 0 1-1.657-.459L5.482 8.062a1.745 1.745 0 0 1-.46-1.657l.548-2.19a.678.678 0 0 0-.122-.58L3.654 1.328zM1.884.511a1.745 1.745 0 0 1 2.612.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.678.678 0 0 0 .178.643l2.457 2.457a.678.678 0 0 0 .644.178l2.189-.547a1.745 1.745 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.634 18.634 0 0 1-7.01-4.42 18.634 18.634 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877L1.885.511z"/>
-                                                </svg>
-                                                <div class="info">
-                                                    <p class="m-0" style="font-size: medium">+7 999 888 77 66</p>
-                                                    <p class="m-0 text-secondary" style="font-size: smaller">Phone number</p>
+                                                <div class="ProfileNameInfo mt-3 d-flex flex-row align-items-center justify-conten-start">
+                                                    <a href="/" class="me-3"><img src="{{ url_for('getuseravatar', useremail=companion.email) }}"
+                                                                              alt="Avatar"
+                                                                              width="100" height="100"
+                                                                              class="rounded-circle">
+                                                    </a>
+                                                    <div class="d-flex flex-column justify-content-center align-items-start">
+                                                        <h4 class="m-0 mb-1">{{ companion.name }}</h4>
+                                                        <p class="m-0 mt-1 text-secondary" style="font-size: smaller">{{ companion.email }}</p>
+                                                    </div>
                                                 </div>
 
                                             </div>
 
-                                            <!-- Информация о логине собесебника -->
-                                            <div class="d-flex mt-2 flex-row align-items-center justify-content-start" style="border: none; outline: none; background-color: inherit">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                                                     fill="currentColor" class="me-2 bi bi-info-circle"
-                                                     viewBox="0 0 16 16">
-                                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                                    <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
-                                                </svg>
-                                                <div class="info">
-                                                    <p class="m-0" style="font-size: medium">UserLogin</p>
-                                                    <p class="m-0 text-secondary" style="font-size: smaller">Login</p>
+                                            <div class="modal-body">
+
+                                                <!-- Информация о телефоне собеседника -->
+                                                <div class="d-flex flex-row align-items-center justify-content-start" style="border: none; outline: none; background-color: inherit">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                                         fill="currentColor" class="me-2 bi bi-telephone"
+                                                         viewBox="0 0 16 16">
+                                                        <path d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.568 17.568 0 0 0 4.168 6.608 17.569 17.569 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.678.678 0 0 0-.58-.122l-2.19.547a1.745 1.745 0 0 1-1.657-.459L5.482 8.062a1.745 1.745 0 0 1-.46-1.657l.548-2.19a.678.678 0 0 0-.122-.58L3.654 1.328zM1.884.511a1.745 1.745 0 0 1 2.612.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.678.678 0 0 0 .178.643l2.457 2.457a.678.678 0 0 0 .644.178l2.189-.547a1.745 1.745 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.634 18.634 0 0 1-7.01-4.42 18.634 18.634 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877L1.885.511z"/>
+                                                    </svg>
+                                                    <div class="info">
+                                                        <p class="m-0" style="font-size: medium">{{ companion.telephone }}</p>
+                                                        <p class="m-0 text-secondary" style="font-size: smaller">Phone number</p>
+                                                    </div>
+
+                                                </div>
+
+                                                <!-- Информация о логине собесебника -->
+                                                <div class="d-flex mt-2 flex-row align-items-center justify-content-start" style="border: none; outline: none; background-color: inherit">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                                         fill="currentColor" class="me-2 bi bi-info-circle"
+                                                         viewBox="0 0 16 16">
+                                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                                        <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                                                    </svg>
+                                                    <div class="info">
+                                                        <p class="m-0" style="font-size: medium">{{ companion.login }}</p>
+                                                        <p class="m-0 text-secondary" style="font-size: smaller">Login</p>
+                                                    </div>
+
                                                 </div>
 
                                             </div>
 
-                                        </div>
+                                            <div class="modal-footer d-flex justify-content-start">
+                                                <p class="text-secondary" style="font-size: smaller">Company name</p>
+                                            </div>
 
-                                        <div class="modal-footer d-flex justify-content-start">
-                                            <p class="text-secondary" style="font-size: smaller">Company name</p>
                                         </div>
-
                                     </div>
                                 </div>
-                            </div>
-                            <!-- endregion -->
-                </div>
-            <!-- endregion -->
-
-            <!-- region Окно сообщений -->
-                <div class="Messages p-3 d-flex flex-fill align-items-end justify-content-start" style="background-color: #8C4164">
-{#                 class="Messages d-flex flex-fill align-items-center justify-content-center"#}
-{#                    <div class="InformationMessage p-3 border d-flex align-items-center justify-content-center" style="border-radius: 10px; background-color: white;">#}
-{#                        <p class="m-0">There's nothing here yet... Write first</p>#}
-{#                    </div>#}
-
-                    <!-- Сообщение 1 -->
-                    <div class="MessageBlock d-flex flex-row align-items-end">
-                        <a href="/" class="me-2"><img src="/static/images/Avatar.png" alt="Avatar" width="30" height="30"
-                             class="rounded-circle">
-                        </a>
-                        <div class="MessageAndTime p-2 d-flex flex-row align-items-center justify-content-between border" style="background-color: white; border-radius: 10px">
-                            <p class="m-0 me-3">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab at autem dicta ea eaque enim illo illum necessitatibus nesciunt non, officiis quasi qui ratione recusandae rem soluta tempore velit voluptates. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab accusamus aliquam cum deserunt dignissimos, ducimus eum facilis illo labore magni molestias nisi quasi quibusdam ratione reiciendis reprehenderit, temporibus, ut. Magni?</p>
-                            <div class="m-0 d-flex flex-column align-self-stretch justify-content-between align-items-center">
-                                <form action="{{ url_for('deletemessage') }}" method="post">
-                                    <button type="submit" name="submit" value="1" class="mt-1 d-flex justify-self-center" style="border: none; outline: none; background-color: inherit">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="darkred"
-                                             class="bi bi-trash3" viewBox="0 0 16 16">
-                                            <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z"/>
-                                        </svg>
-                                    </button>
-                                </form>
-                                <p class="m-0 d-flex justify-self-center" style="font-size: smaller">00:00</p>
-                            </div>
-                        </div>
+                                <!-- endregion -->
                     </div>
+                <!-- endregion -->
 
-                </div>
-            <!-- endregion -->
+                <!-- region Окно сообщений -->
+                        {% if not message %}
+                            <div class="Messages p-3 d-flex flex-fill align-items-center justify-content-center" style="background-color: #8C4164">
+                                <div class="InformationMessage p-3 border d-flex align-items-center justify-content-center" style="border-radius: 10px; background-color: white;">
+                                    <p class="m-0">Здесь еще ничего нет... Напиши первым!</p>
+                                </div>
+                            </div>
+                        {% else %}
 
-            <!-- region Ввод сообщения -->
-                <div class="MessageTools p-2 d-flex flex-row align-items-center justify-content-between" style="background-color: #470323">
-                    <input type="text" name="MessageText" class="form-control" style="border: none; outline: none; background-color: #470323; color: white" placeholder="Write message...">
-                    <button class="d-flex me-2 align-items-center justify-content-center" style="border: none; outline: none; background-color: inherit">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white"
-                             class="bi bi-send" viewBox="0 0 16 16">
-                            <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z"/>
-                        </svg>
-                    </button>
-                </div>
-            <!-- endregion -->
+                                <div class="Messages p-3 d-flex flex-column flex-fill align-items-start justify-content-end" style="background-color: #8C4164">
+                                    <!-- Сообщение 1 -->
+                                    {% for mes in message %}
+                                    <div class="MessageBlock my-1 d-flex flex-row align-items-end">
+                                        <a href="/" class="me-2"><img src="/static/images/Avatar.png" alt="Avatar" width="30" height="30"
+                                             class="rounded-circle">
+                                        </a>
+                                        <div class="MessageAndTime p-2 d-flex flex-row align-items-center justify-content-between border" style="background-color: white; border-radius: 10px">
+                                            <p class="m-0 me-3">{{ mes[3] }}</p>
+                                            <div class="m-0 d-flex flex-column align-self-stretch justify-content-between align-items-center">
+                                                <form action="{{ url_for('deletemessage') }}" method="post">
+                                                    <button type="submit" name="submit" value="1" class="mt-1 d-flex justify-self-center" style="border: none; outline: none; background-color: inherit">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="darkred"
+                                                             class="bi bi-trash3" viewBox="0 0 16 16">
+                                                            <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z"/>
+                                                        </svg>
+                                                    </button>
+                                                </form>
+                                                <p class="m-0 d-flex justify-self-center" style="font-size: smaller">{{ mes[4] }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                        {% endif %}
+                <!-- endregion -->
+
+                <!-- region Ввод сообщения -->
+                    <div class="MessageTools p-2 d-flex flex-row align-items-center justify-content-between" style="background-color: #470323">
+                        <input type="text" name="MessageText" class="form-control" style="border: none; outline: none; background-color: #470323; color: white" placeholder="Write message...">
+                        <button class="d-flex me-2 align-items-center justify-content-center" style="border: none; outline: none; background-color: inherit">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white"
+                                 class="bi bi-send" viewBox="0 0 16 16">
+                                <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z"/>
+                            </svg>
+                        </button>
+                    </div>
+                <!-- endregion -->
+
+            {% endif %}
+
 
         </div>
 
