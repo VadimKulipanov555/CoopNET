@@ -2,9 +2,8 @@ from flask import Flask, url_for, redirect, session, render_template, request, f
 
 from myConfig import Config
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from sqlalchemy.sql.functions import current_user
-from flask_login import LoginManager, UserMixin, logout_user, login_required, login_user
+#from flask_migrate import Migrate
+from flask_login import LoginManager, UserMixin, current_user, logout_user, login_required, login_user
 import phonenumbers
 import re
 from datetime import datetime
@@ -17,7 +16,7 @@ app.config.from_object(Config)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///coopNet.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+#migrate = Migrate(app, db)
 login_manager = LoginManager(app)
 
 
@@ -30,14 +29,14 @@ chat_user = db.Table(
 
 class User(db.Model, UserMixin):
     __tablename__ = 'Пользователь'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(320), unique=True)
     name = db.Column(db.String(60))
     telephone = db.Column(db.String(15), unique=True)
     login = db.Column(db.String(32), unique=True)
     password = db.Column(db.String(500))
     info = db.Column(db.String(70))
-    date_registration = db.Column(db.DateTime, default=str(datetime.now())[:10])
+    date_registration = db.Column(db.DateTime, default=datetime.utcnow)
     # theme =
     photo = db.Column(db.BLOB, nullable=True)
 
@@ -85,7 +84,7 @@ class User(db.Model, UserMixin):
             return False
         return True
 
-    def repr(self):
+    def __repr__(self):
         return '<User $r>' % self.id
 
 
@@ -106,14 +105,14 @@ class Message(db.Model):
     chat_id = db.Column(db.Integer, db.ForeignKey('Чат.chat_id'))
     message_sender = db.Column(db.String(320), db.ForeignKey('Пользователь.email'))
     message_content = db.Column(db.String(120))
-    message_date_sent = db.Column(db.DateTime, default=str(datetime.now())[:19])
+    message_date_sent = db.Column(db.DateTime, default=datetime.utcnow)
     message_status = db.Column(db.Integer, default=0)
 
 
 @login_manager.user_loader
 def load_user(user_id):
 
-    session['user'] = user_id
+    #session['user'] = user_id
     return User.query.get(user_id)
 
 
@@ -227,11 +226,16 @@ def registration():
             for row in table:
                 try:
                     user1, user2 = row
+                    #sql_chat = text("insert into 'Чат' (chat_name, chat_description, chat_creator) VALUES (user2, 'friend', user1)")
+                    #db.engine.execute(sql)
+
+                    #sql_new_chat = text("select * from 'Чат' where chat_name=='{}' and chat_creator=='{}'".format(user2, user1))
+                    #new_chat = db.engine.execute(sql_new_chat)
 
                     user_in_db = db.session.query(User).filter_by(email=user1).first()
                     user_in_db_2 = db.session.query(User).filter_by(email=user2).first()
 
-                    chat = Chat(chat_name=None, chat_description='friend', chat_creator=user1)
+                    chat = Chat(chat_name=user2, chat_description='friend', chat_creator=user1)
                     chat.cats.append(user_in_db)
                     chat.cats.append(user_in_db_2)
                     db.session.add(chat)
@@ -269,11 +273,12 @@ def authorization():
 
         if check_password_hash(password, request.form['password']):
             user = User.query.filter_by(email=request.form['email'].lower()).first()
-            load_user(email)
             login_user(user)
+            load_user(email)
+
+            sql = text('')
 
             return redirect(url_for('homepage'))
-
         else:
             return render_template('Authorization.html', title='Authorization', message='Ошибка ввода данных')
 
@@ -282,8 +287,13 @@ def authorization():
 
 @app.route('/HomePage', methods=['GET', 'POST'])
 def homepage():
+    user = current_user
+    chat_name = ''
+    messages_chat = ''
 
-    sql = text("select chat_id, email, message_content, message_date_sent "
+    # Получаем все чаты пользователя
+    sql = text("select allChats.chat_id, allChats.email, allChats.message_content, allChats.message_date_sent, user.photo "
+               "from (select chat_id, email, message_content, message_date_sent "
                "from (select * "
                "from (select ch.chat_id, email "
                "from (select chat_id "
@@ -291,7 +301,7 @@ def homepage():
                "where email=='{0}') ch inner join 'Список Участников Чата' ch2 on ch.chat_id ==ch2.chat_id "
                "where email != '{0}') ch left outer join Сообщение c on ch.chat_id = c.chat_id "
                "order by message_date_sent desc) t "
-               "group by t.chat_id".format(session['user']))
+               "group by t.chat_id) allChats left join 'Пользователь' user on allChats.email = user.email".format(current_user.email))
     chat = [row for row in db.engine.execute(sql)]
 
     for count, row in enumerate(chat):
@@ -305,38 +315,41 @@ def homepage():
 
         chat_id = request.args.get('chat_id', 1, type=int)
 
-        sql = text("UPDATE Сообщение "
+        sql = text("UPDATE 'Сообщение' "
                    "set message_status = 1 "
-                   "where chat_id == '{}' and message_sender!='{}'".format(chat_id, current_user.id))
+                   "where chat_id == '{}' and message_sender !='{}'".format(chat_id, current_user.id))
 
         db.engine.execute(sql)
 
         sql = text("select * "
-                   "from Сообщение "
+                   "from 'Сообщение' "
                    "where chat_id == '{}' "
-                   "order by message_date_sent desc".format(chat_id))
+                   "order by message_date_sent asc".format(chat_id))
 
-        message_chat = [row for row in db.engine.execute(sql)]
+        messages_chat = [row for row in db.engine.execute(sql)]
+        for count, row in enumerate(messages_chat):
+            row = list(row)
+            if row[4] is not None:
+                row[4] = str(datetime.fromtimestamp(int(str(row[4])[0:10]) - 10800))[11:16]
+
+            messages_chat[count] = tuple(row)
 
         sql = text("select email "
-                   "from Список Участников Чата "
+                   "from 'Список Участников Чата' "
                    "where chat_id=='{}' and email!='{}'".format(chat_id, current_user.email))
 
-        chat_name = db.engine.execute(sql)
+        chat_name = db.engine.execute(sql).first()
 
-        return redirect(url_for('homepage', myChat=chat, name=chat_name, message=message_chat))
+        # SQL запрос на профиль по chat_name
+        sql = text("select email, name, telephone, login, info, date_registration "
+                   "from 'Пользователь' "
+                   "where email=='{}' ".format(chat_name[0]))
 
-    return render_template('HomePage.html', title='HomePage', myChat=chat)
+        companion = db.engine.execute(sql).first()
 
-@app.route('/DelMessage', methods=['GET', 'POST'])
-def del_message():
+        return render_template('HomePage.html', user=user, myChat=chat, name=chat_name, message=messages_chat, companion=companion)
 
-    content = request.form['content_message']
-
-    sql = text("INSERT INTO Сообщение (chat_id, message_sender, message_content, message_date_sent, message_status) "
-               "VALUES ('{}')".format(chat_id, current_user.id, content, datetime.utcnow(), 0))
-    db.engine.execute(sql)
-
+    return render_template('HomePage.html', user=user, myChat=chat, name=chat_name, message=messages_chat)
 
 
 #Обработчик удаления аватара пользователя
@@ -396,6 +409,17 @@ def deletemessage():
         flash('Ошибка удаления сообщения')
     return redirect(url_for('homepage'))
 
-
 if __name__ == '__main__':
     app.run(debug=True)
+
+@app.route('/getuseravatar', methods=['POST', 'GET'])
+def getuseravatar():
+    useremail = request.args.get('useremail')
+    user = User.query.filter_by(email=useremail).first()
+    img = user.GetAvatar(app)
+    if not img:
+        return ""
+
+    h = make_response(img)
+    h.headers['Content-Type'] = '/Image/png'
+    return h
