@@ -2,7 +2,7 @@ from flask import Flask, url_for, redirect, session, render_template, request, f
 
 from myConfig import Config
 from flask_sqlalchemy import SQLAlchemy
-#from flask_migrate import Migrate
+# from flask_migrate import Migrate
 from flask_login import LoginManager, UserMixin, current_user, logout_user, login_required, login_user
 import phonenumbers
 import re
@@ -16,7 +16,7 @@ app.config.from_object(Config)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///coopNet.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-#migrate = Migrate(app, db)
+# migrate = Migrate(app, db)
 login_manager = LoginManager(app)
 
 
@@ -112,7 +112,7 @@ class Message(db.Model):
 @login_manager.user_loader
 def load_user(user_id):
 
-    #session['user'] = user_id
+    # session['user'] = user_id
     return User.query.get(user_id)
 
 
@@ -239,6 +239,7 @@ def userInformation(user):
     return [row for row in db.engine.execute(sql)]
 # endregion
 
+
 @app.route('/registration', methods=['GET', 'POST'])
 def registration():
     error = {}
@@ -256,12 +257,12 @@ def registration():
         if not error:
             sql = text("INSERT INTO 'Пользователь' (email, name, telephone, login, password, info, date_registration) "
                        "VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(request.form['reg_email'].lower(),
-                                                                                   request.form['name'],
-                                                                                   request.form['phone'],
-                                                                                   request.form['login'],
-                                                                                   generate_password_hash(request.form['reg_password']),
-                                                                                   'Напишите информацию о себе',
-                                                                                   datetime.utcnow()))
+                                                                                  request.form['name'],
+                                                                                  request.form['phone'],
+                                                                                  request.form['login'],
+                                                                                  generate_password_hash(request.form['reg_password']),
+                                                                                  'Напишите информацию о себе',
+                                                                                  datetime.utcnow()))
             print('Запрос был оформлен')
             db.engine.execute(sql)
 
@@ -289,7 +290,6 @@ def registration():
                 # Сохраняем изменения в таблице
                 db.session.commit()
 
-
             return redirect(url_for('authorization'))
         else:
             return render_template('Registration.html', title='Registration', message=[error, not_error])
@@ -306,7 +306,7 @@ def authorization():
         isValidUser(error, user[0][0])
 
         if error:
-            error = {}
+            error.clear()
             sql = text("select email, password from 'Пользователь' where email=='{}'".format(request.form['email'].lower()))
             info_user = [row for row in db.engine.execute(sql)]
             email, password = info_user[0]
@@ -317,8 +317,6 @@ def authorization():
             user = User.query.filter_by(email=request.form['email'].lower()).first()
             login_user(user)
             load_user(email)
-
-            sql = text('')
 
             return redirect(url_for('homepage'))
         else:
@@ -356,7 +354,7 @@ def homepage():
     return render_template('HomePage.html', user=user, myChat=chat, name=chat_name, message=messages_chat)
 
 
-#Обработчик удаления аватара пользователя
+# Обработчик удаления аватара пользователя
 @app.route('/removeavatar', methods=['POST', 'GET'])
 @login_required
 def removeavatar():
@@ -394,7 +392,7 @@ def upload():
                 if not result:
                     flash('Ошибка обновления аватара', 'error')
                 flash('Аватар успешно обновлен', 'success')
-            except FileNotFoundError as e:
+            except FileNotFoundError:
                 flash('Ошибка обновления аватара', 'error')
                 return redirect(url_for('homepage'))
         return redirect(url_for('homepage'))
@@ -412,9 +410,6 @@ def deletemessage():
     except:
         flash('Ошибка удаления сообщения')
     return redirect(url_for('homepage'))
-
-if __name__ == '__main__':
-    app.run(debug=True)
 
 
 @app.route('/getuseravatar', methods=['POST', 'GET'])
@@ -449,3 +444,7 @@ def sendmessage():
     companion = chatParticipantProfile(chat_name[0])
 
     return render_template('HomePage.html', user=current_user, myChat=chat, name=chat_name, message=messages_chat, companion=companion, chat_id=chat_id)
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
