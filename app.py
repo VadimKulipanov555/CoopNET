@@ -304,12 +304,12 @@ def homepage():
                "group by t.chat_id) allChats left join 'Пользователь' user on allChats.email = user.email".format(current_user.email))
     chat = [row for row in db.engine.execute(sql)]
 
-    for count, row in enumerate(chat):
-        row = list(row)
-        if row[3] is not None:
-            row[3] = str(datetime.fromtimestamp(int(str(row[3])[0:10]) - 10800))[11:16]
-
-        chat[count] = tuple(row)
+    # for count, row in enumerate(chat):
+    #     row = list(row)
+    #     if row[3] is not None:
+    #         row[3] = str(datetime.fromtimestamp(int(str(row[3])[0:10]) - 10800))[11:16]
+    #
+    #     chat[count] = tuple(row)
 
     if request.method == "POST":
 
@@ -327,12 +327,12 @@ def homepage():
                    "order by message_date_sent asc".format(chat_id))
 
         messages_chat = [row for row in db.engine.execute(sql)]
-        for count, row in enumerate(messages_chat):
-            row = list(row)
-            if row[4] is not None:
-                row[4] = str(datetime.fromtimestamp(int(str(row[4])[0:10]) - 10800))[11:16]
+        # for count, row in enumerate(messages_chat):
+        #     row = list(row)
+        #     if row[4] is not None:
+        #         row[4] = str(datetime.fromtimestamp(int(str(row[4])[0:10]) - 10800))[11:16]
 
-            messages_chat[count] = tuple(row)
+            # messages_chat[count] = tuple(row)
 
         sql = text("select email "
                    "from 'Список Участников Чата' "
@@ -347,7 +347,7 @@ def homepage():
 
         companion = db.engine.execute(sql).first()
 
-        return render_template('HomePage.html', user=user, myChat=chat, name=chat_name, message=messages_chat, companion=companion)
+        return render_template('HomePage.html', user=user, myChat=chat, name=chat_name, message=messages_chat, companion=companion, chat_id=chat_id)
 
     return render_template('HomePage.html', user=user, myChat=chat, name=chat_name, message=messages_chat)
 
@@ -423,3 +423,16 @@ def getuseravatar():
     h = make_response(img)
     h.headers['Content-Type'] = '/Image/png'
     return h
+
+
+@app.route('/sendmessage', methods=['POST'])
+def sendmessage():
+    chat_id = request.args.get('chat_id')
+    message_content = request.form.get('MessageText')
+
+    sql = text("insert into 'Сообщение' ('chat_id', 'message_sender', 'message_content', 'message_date_sent', 'message_status') "
+               "values ({}, {}, '{}', '{}', '0') ".format(chat_id, current_user.id, message_content, datetime.utcnow()))
+    print(sql)
+
+    db.engine.execute(sql)
+    return redirect(url_for('homepage'))
