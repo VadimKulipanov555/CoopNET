@@ -53,7 +53,7 @@
                                 <div class="modal-body">
 
                                     <!-- Кнопка создания группового чата -->
-                                    <button class="MenuItem d-flex flex-row align-items-center justify-content-start" style="border: none; outline: none; background-color: inherit">
+                                    <button class="MenuItem d-flex flex-row align-items-center justify-content-start" data-bs-toggle="modal" data-bs-target="#GroupChatModal" style="border: none; outline: none; background-color: inherit">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
                                              fill="currentColor" class="me-2 bi bi-chat-square-dots" viewBox="0 0 16 16">
                                             <path d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-2.5a2 2 0 0 0-1.6.8L8 14.333 6.1 11.8a2 2 0 0 0-1.6-.8H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2.5a1 1 0 0 1 .8.4l1.9 2.533a1 1 0 0 0 1.6 0l1.9-2.533a1 1 0 0 1 .8-.4H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
@@ -152,6 +152,65 @@
                         </div>
                     </div>
                 <!-- endregion -->
+
+                <!-- region Модальное окно создания группового чата -->
+                    <div class="modal fade" id="GroupChatModal" tabindex="-1" aria-labelledby="GroupChatModalLabel"
+                         aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                            <div class="modal-content">
+
+                                <div class="modal-header d-flex flex-column justify-content-center align-items-start">
+
+{#                                    <div class="d-flex flex-row align-self-stretch justify-content-between align-items-center">#}
+{#                                        <h5 class="modal-title me-2" id="InterlocutorModalLabel">Групповой чат</h5>#}
+{#                                        <button type="button" class="btn-close" data-bs-dismiss="modal"#}
+{#                                                aria-label="Close"></button>#}
+{#                                    </div>#}
+                                    <div class="ProfileNameInfo mt-3 d-flex flex-row align-items-center justify-content-start">
+                                        <div class="d-flex flex-column justify-content-center align-items-start">
+                                            <h5 class="m-0 mb-1">Название чата</h5>
+                                            <input type="text" name="ChatNameCreate" id="ChatNameCreate" class="m-0 mt-1 rounded" style="border: none; outline: none; background-color: white;" placeholder="Введите название"></div>
+                                    </div>
+
+                                </div>
+
+                                <div class="modal-body">
+
+                                    {% for item in myChat %}
+                                        
+                                        <div class="form-check m-0 my-1 p-0 d-flex flex-row-reverse align-items-center justify-content-between">
+                                            <input class="form-check-input" type="checkbox" value="" id="UserInChatCheck_{{ item[0] }}">
+                                            <label class="form-check-label" for="UserInChatCheck_{{ item[0] }}">
+                                                <div class="Chat d-flex flex-row align-items-center justify-content-between">
+                                                    <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">
+
+                                                        <img src="{{ url_for('getuseravatar', useremail=item[1]) }}"
+                                                             alt="Avatar" width="55" height="55"
+                                                             class="me-2 rounded-circle">
+                                                        <div class="ChatInfo me-4 d-flex flex-column justify-content-center align-items-start">
+                                                            <h6 class="m-0">{{ item[1] }}</h6>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </label>
+                                        </div>
+
+                                    {% endfor %}
+
+                                </div>
+
+                                <div class="modal-footer d-flex justify-content-between">
+                                    <p class="text-secondary" style="font-size: smaller">Company name</p>
+                                    <div class="d-flex flex-row align-items-center">
+                                        <button type="button" class="me-2 btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                        <button type="button" class="btn btn-primary">Создать</button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                 <!-- endregion -->
 
                 <input type="search" name="q" class="form-control" value="" placeholder="Search..." aria-label="Search">
             </div>
