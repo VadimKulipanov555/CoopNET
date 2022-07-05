@@ -191,6 +191,54 @@ def isValidUser(error, user):
 # endregion
 
 
+# region SQL
+def gettingChats():
+    # Получаем все чаты пользователя
+    sql = text(
+        "select allChats.chat_id, allChats.email, allChats.message_content, allChats.message_date_sent, user.photo "
+        "from (select chat_id, email, message_content, message_date_sent "
+        "from (select * "
+        "from (select ch.chat_id, email "
+        "from (select chat_id "
+        "from 'Список Участников Чата' "
+        "where email=='{0}') ch inner join 'Список Участников Чата' ch2 on ch.chat_id ==ch2.chat_id "
+        "where email != '{0}') ch left outer join Сообщение c on ch.chat_id = c.chat_id "
+        "order by message_date_sent desc) t "
+        "group by t.chat_id) allChats left join 'Пользователь' user on allChats.email = user.email".format(
+            current_user.email))
+    return [row for row in db.engine.execute(sql)]
+
+
+def receivingChatMessages(chat_id):
+    sql = text("select * "
+               "from 'Сообщение' "
+               "where chat_id == '{}' "
+               "order by message_date_sent asc".format(chat_id))
+
+    return [row for row in db.engine.execute(sql)]
+
+
+def gettingChatParticipants(chat_id):
+    sql = text("select email "
+               "from 'Список Участников Чата' "
+               "where chat_id=='{}' and email!='{}'".format(chat_id, current_user.email))
+
+    return db.engine.execute(sql).first()
+
+
+def chatParticipantProfile(chat_name):
+    sql = text("select email, name, telephone, login, info, date_registration "
+               "from 'Пользователь' "
+               "where email=='{}' ".format(chat_name))
+
+    return db.engine.execute(sql).first()
+
+
+def userInformation(user):
+    sql = text("select count(*) from 'Пользователь' where email=='{}'".format(user))
+    return [row for row in db.engine.execute(sql)]
+# endregion
+
 @app.route('/registration', methods=['GET', 'POST'])
 def registration():
     error = {}
@@ -202,8 +250,7 @@ def registration():
         isValidEmail(error, not_error, request.form['reg_email'])
         isValidPassword(error, not_error, request.form['reg_password'], request.form['confirm_password'])
 
-        sql = text("select count(*) from 'Пользователь' where email=='{}'".format(request.form['reg_email'].lower()))
-        user = [row for row in db.engine.execute(sql)]
+        user = userInformation(request.form['reg_email'].lower())
         isValidUser(error, user[0][0])
 
         if not error:
@@ -226,11 +273,6 @@ def registration():
             for row in table:
                 try:
                     user1, user2 = row
-                    #sql_chat = text("insert into 'Чат' (chat_name, chat_description, chat_creator) VALUES (user2, 'friend', user1)")
-                    #db.engine.execute(sql)
-
-                    #sql_new_chat = text("select * from 'Чат' where chat_name=='{}' and chat_creator=='{}'".format(user2, user1))
-                    #new_chat = db.engine.execute(sql_new_chat)
 
                     user_in_db = db.session.query(User).filter_by(email=user1).first()
                     user_in_db_2 = db.session.query(User).filter_by(email=user2).first()
@@ -259,8 +301,8 @@ def registration():
 def authorization():
     if request.method == 'POST':
         error = {}
-        sql = text("select count(*) as ct from 'Пользователь' where email=='{}'".format(request.form['email'].lower()))
-        user = [row for row in db.engine.execute(sql)]
+
+        user = userInformation(request.form['email'].lower())
         isValidUser(error, user[0][0])
 
         if error:
@@ -291,25 +333,7 @@ def homepage():
     chat_name = ''
     messages_chat = ''
 
-    # Получаем все чаты пользователя
-    sql = text("select allChats.chat_id, allChats.email, allChats.message_content, allChats.message_date_sent, user.photo "
-               "from (select chat_id, email, message_content, message_date_sent "
-               "from (select * "
-               "from (select ch.chat_id, email "
-               "from (select chat_id "
-               "from 'Список Участников Чата' "
-               "where email=='{0}') ch inner join 'Список Участников Чата' ch2 on ch.chat_id ==ch2.chat_id "
-               "where email != '{0}') ch left outer join Сообщение c on ch.chat_id = c.chat_id "
-               "order by message_date_sent desc) t "
-               "group by t.chat_id) allChats left join 'Пользователь' user on allChats.email = user.email".format(current_user.email))
-    chat = [row for row in db.engine.execute(sql)]
-
-    # for count, row in enumerate(chat):
-    #     row = list(row)
-    #     if row[3] is not None:
-    #         row[3] = str(datetime.fromtimestamp(int(str(row[3])[0:10]) - 10800))[11:16]
-    #
-    #     chat[count] = tuple(row)
+    chat = gettingChats()
 
     if request.method == "POST":
 
@@ -321,31 +345,11 @@ def homepage():
 
         db.engine.execute(sql)
 
-        sql = text("select * "
-                   "from 'Сообщение' "
-                   "where chat_id == '{}' "
-                   "order by message_date_sent asc".format(chat_id))
+        messages_chat = receivingChatMessages(chat_id)
 
-        messages_chat = [row for row in db.engine.execute(sql)]
-        # for count, row in enumerate(messages_chat):
-        #     row = list(row)
-        #     if row[4] is not None:
-        #         row[4] = str(datetime.fromtimestamp(int(str(row[4])[0:10]) - 10800))[11:16]
+        chat_name = gettingChatParticipants(chat_id)
 
-            # messages_chat[count] = tuple(row)
-
-        sql = text("select email "
-                   "from 'Список Участников Чата' "
-                   "where chat_id=='{}' and email!='{}'".format(chat_id, current_user.email))
-
-        chat_name = db.engine.execute(sql).first()
-
-        # SQL запрос на профиль по chat_name
-        sql = text("select email, name, telephone, login, info, date_registration "
-                   "from 'Пользователь' "
-                   "where email=='{}' ".format(chat_name[0]))
-
-        companion = db.engine.execute(sql).first()
+        companion = chatParticipantProfile(chat_name[0])
 
         return render_template('HomePage.html', user=user, myChat=chat, name=chat_name, message=messages_chat, companion=companion, chat_id=chat_id)
 
@@ -412,6 +416,7 @@ def deletemessage():
 if __name__ == '__main__':
     app.run(debug=True)
 
+
 @app.route('/getuseravatar', methods=['POST', 'GET'])
 def getuseravatar():
     useremail = request.args.get('useremail')
@@ -432,7 +437,15 @@ def sendmessage():
 
     sql = text("insert into 'Сообщение' ('chat_id', 'message_sender', 'message_content', 'message_date_sent', 'message_status') "
                "values ({}, {}, '{}', '{}', '0') ".format(chat_id, current_user.id, message_content, datetime.utcnow()))
-    print(sql)
 
     db.engine.execute(sql)
-    return redirect(url_for('homepage'))
+
+    chat = gettingChats()
+
+    messages_chat = receivingChatMessages(chat_id)
+
+    chat_name = gettingChatParticipants(chat_id)
+
+    companion = chatParticipantProfile(chat_name[0])
+
+    return render_template('HomePage.html', user=current_user, myChat=chat, name=chat_name, message=messages_chat, companion=companion, chat_id=chat_id)
