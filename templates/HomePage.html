@@ -158,55 +158,55 @@
                          aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                             <div class="modal-content">
+                                <form action="{{ url_for('creatingChat') }}" method="POST">
+                                    <div class="modal-header d-flex flex-column justify-content-center align-items-start">
 
-                                <div class="modal-header d-flex flex-column justify-content-center align-items-start">
-
-{#                                    <div class="d-flex flex-row align-self-stretch justify-content-between align-items-center">#}
-{#                                        <h5 class="modal-title me-2" id="InterlocutorModalLabel">Групповой чат</h5>#}
-{#                                        <button type="button" class="btn-close" data-bs-dismiss="modal"#}
-{#                                                aria-label="Close"></button>#}
-{#                                    </div>#}
-                                    <div class="ProfileNameInfo mt-3 d-flex flex-row align-items-center justify-content-start">
-                                        <div class="d-flex flex-column justify-content-center align-items-start">
-                                            <h5 class="m-0 mb-1">Название чата</h5>
-                                            <input type="text" name="ChatNameCreate" id="ChatNameCreate" class="m-0 mt-1 rounded" style="border: none; outline: none; background-color: white;" placeholder="Введите название"></div>
-                                    </div>
-
-                                </div>
-
-                                <div class="modal-body">
-
-                                    {% for item in myChat %}
-                                        
-                                        <div class="form-check m-0 my-1 p-0 d-flex flex-row-reverse align-items-center justify-content-between">
-                                            <input class="form-check-input" type="checkbox" value="" id="UserInChatCheck_{{ item[0] }}">
-                                            <label class="form-check-label" for="UserInChatCheck_{{ item[0] }}">
-                                                <div class="Chat d-flex flex-row align-items-center justify-content-between">
-                                                    <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">
-
-                                                        <img src="{{ url_for('getuseravatar', useremail=item[1]) }}"
-                                                             alt="Avatar" width="55" height="55"
-                                                             class="me-2 rounded-circle">
-                                                        <div class="ChatInfo me-4 d-flex flex-column justify-content-center align-items-start">
-                                                            <h6 class="m-0">{{ item[1] }}</h6>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </label>
+    {#                                    <div class="d-flex flex-row align-self-stretch justify-content-between align-items-center">#}
+    {#                                        <h5 class="modal-title me-2" id="InterlocutorModalLabel">Групповой чат</h5>#}
+    {#                                        <button type="button" class="btn-close" data-bs-dismiss="modal"#}
+    {#                                                aria-label="Close"></button>#}
+    {#                                    </div>#}
+                                        <div class="ProfileNameInfo mt-3 d-flex flex-row align-items-center justify-content-start">
+                                            <div class="d-flex flex-column justify-content-center align-items-start">
+                                                <h5 class="m-0 mb-1">Название чата</h5>
+                                                <input type="text" name="ChatNameCreate" id="ChatNameCreate" class="m-0 mt-1 rounded" style="border: none; outline: none; background-color: white;" placeholder="Введите название"></div>
                                         </div>
 
-                                    {% endfor %}
-
-                                </div>
-
-                                <div class="modal-footer d-flex justify-content-between">
-                                    <p class="text-secondary" style="font-size: smaller">Company name</p>
-                                    <div class="d-flex flex-row align-items-center">
-                                        <button type="button" class="me-2 btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                                        <button type="button" class="btn btn-primary">Создать</button>
                                     </div>
-                                </div>
 
+                                    <div class="modal-body">
+
+                                        {% for item in all_user %}
+
+                                            <div class="form-check m-0 my-1 p-0 d-flex flex-row-reverse align-items-center justify-content-between">
+                                                <input class="form-check-input" type="checkbox" name="{{ item[1] }}" value="" id="UserInChatCheck_{{ item[0] }}">
+                                                <label class="form-check-label" for="UserInChatCheck_{{ item[0] }}">
+                                                    <div class="Chat d-flex flex-row align-items-center justify-content-between">
+                                                        <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">
+
+                                                            <img src="{{ url_for('getuseravatar', useremail=item[1]) }}"
+                                                                 alt="Avatar" width="55" height="55"
+                                                                 class="me-2 rounded-circle">
+                                                            <div class="ChatInfo me-4 d-flex flex-column justify-content-center align-items-start">
+                                                                <h6 class="m-0">{{ item[1] }}</h6>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                            </div>
+
+                                        {% endfor %}
+
+                                    </div>
+
+                                    <div class="modal-footer d-flex justify-content-between">
+                                        <p class="text-secondary" style="font-size: smaller">Company name</p>
+                                        <div class="d-flex flex-row align-items-center">
+                                            <button type="button" class="me-2 btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                            <button type="submit" class="btn btn-primary">Создать</button>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -232,10 +232,12 @@
                                 <div class="ChatInfo me-4 d-flex flex-column justify-content-center align-items-start">
 
                                     <h6 class="m-0" style="color: white">{{ item[1] }}</h6>
+
                                     <p class="m-0 mt-1" style="font-size: small; color: white">
                                         {% if item[2] == None %}{{ 'пусто' }}{% else %}{{ item[2] }}{% endif %}</p>
                                 </div>
                             </div>
+
                             <div class="Time d-flex justify-content-center align-items-start">
                                 <p style="color: white">
                                     {% if item[3] == None %}{{ '' }}{% else %}{{ item[3][11:16] }}{% endif %}</p>
@@ -360,14 +362,14 @@
                                     <!-- Сообщение 1 -->
                                     {% for mes in message %}
                                     <div class="MessageBlock my-1 d-flex flex-row align-items-end">
-                                        <a href="/" class="me-2"><img src="/static/images/Avatar.png" alt="Avatar" width="30" height="30"
+                                        <a href="/" class="me-2"><img src="{{ url_for('getuseravatar', useremail=mes[2]) }}" alt="Avatar" width="30" height="30"
                                              class="rounded-circle">
                                         </a>
                                         <div class="MessageAndTime p-2 d-flex flex-row align-items-center justify-content-between border" style="background-color: white; border-radius: 10px">
                                             <p class="m-0 me-3">{{ mes[3] }}</p>
                                             <div class="m-0 d-flex flex-column align-self-stretch justify-content-between align-items-center">
                                                 <form action="{{ url_for('deletemessage') }}" method="post">
-                                                    <button type="submit" name="submit" value="1" class="mt-1 d-flex justify-self-center" style="border: none; outline: none; background-color: inherit">
+                                                    <button type="submit" name="submit" value="{{ mes[0] }}" class="mt-1 d-flex justify-self-center" style="border: none; outline: none; background-color: inherit">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="darkred"
                                                              class="bi bi-trash3" viewBox="0 0 16 16">
                                                             <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z"/>
@@ -385,7 +387,7 @@
 
                 <!-- region Ввод сообщения -->
                     <form action="{{ url_for('sendmessage', chat_id=chat_id) }}" method="post" class="MessageTools p-2 d-flex flex-row align-items-center justify-content-between" style="background-color: #470323">
-                        <input type="text" name="MessageText" class="form-control" style="border: none; outline: none; background-color: #470323; color: white" placeholder="Write message...">
+                        <input type="text" name="MessageText" class="form-control" style="border: none; outline: none; background-color: #470323; color: white" placeholder="Напишите сообщение...">
                         <button type="submit" class="d-flex me-2 align-items-center justify-content-center" style="border: none; outline: none; background-color: inherit">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white"
                                  class="bi bi-send" viewBox="0 0 16 16">

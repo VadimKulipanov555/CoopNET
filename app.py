@@ -194,18 +194,31 @@ def isValidUser(error, user):
 # region SQL
 def gettingChats():
     # Получаем все чаты пользователя
-    sql = text(
-        "select allChats.chat_id, allChats.email, allChats.message_content, allChats.message_date_sent, user.photo "
-        "from (select chat_id, email, message_content, message_date_sent "
-        "from (select * "
-        "from (select ch.chat_id, email "
-        "from (select chat_id "
-        "from 'Список Участников Чата' "
-        "where email=='{0}') ch inner join 'Список Участников Чата' ch2 on ch.chat_id ==ch2.chat_id "
-        "where email != '{0}') ch left outer join Сообщение c on ch.chat_id = c.chat_id "
-        "order by message_date_sent desc) t "
-        "group by t.chat_id) allChats left join 'Пользователь' user on allChats.email = user.email".format(
-            current_user.email))
+    sql = text("select allChats.chat_id, allChats.email, allChats.message_content, allChats.message_date_sent "
+               "from (select chat_id, email, message_content, message_date_sent "
+               "from (select * "
+               "from (select ch.chat_id, email "
+               "from (select chat_id "
+               "from 'Список Участников Чата' "
+               "where chat_id not in (select chat_id from 'Чат' where chat_description=='chat') and email=='{0}') ch inner join 'Список Участников Чата' ch2 on ch.chat_id ==ch2.chat_id "
+               "where email != '{0}') ch left outer join Сообщение c on ch.chat_id = c.chat_id "
+               "order by message_date_sent desc) t "
+               "group by t.chat_id) allChats left join 'Пользователь' user on allChats.email = user.email".format(current_user.email))
+    return [row for row in db.engine.execute(sql)]
+
+
+def gettingGroupChats():
+
+    sql = text("select chat_id, chat_name, message_content, message_date_sent, chat_description, chat_creator, message_id, message_status "
+               "from (select chInfo.*, c.message_id, c.message_content, c.message_date_sent, c.message_status "
+               "from (select myCh.*, ch.chat_name, ch.chat_description, ch.chat_creator "
+               "from (select chat_id "
+               "from 'Список Участников Чата' "
+               "where email=='{}') myCh inner join 'Чат' ch on myCh.chat_id==ch.chat_id "
+               "where chat_description == 'chat' ) chInfo left outer join 'Сообщение' c on chInfo.chat_id==c.chat_id "
+               "order by message_date_sent desc) info "
+               "group by info.chat_id".format(current_user.email))
+
     return [row for row in db.engine.execute(sql)]
 
 
@@ -235,7 +248,13 @@ def chatParticipantProfile(chat_name):
 
 
 def userInformation(user):
-    sql = text("select count(*) from 'Пользователь' where email=='{}'".format(user))
+
+    if user is not None:
+        sql = text("select count(*) from 'Пользователь' where email=='{}'".format(user))
+    else:
+        sql =text("select * "
+                  "from 'Пользователь' "
+                  "where email!='{}'".format(current_user.email))
     return [row for row in db.engine.execute(sql)]
 # endregion
 
@@ -332,6 +351,10 @@ def homepage():
     messages_chat = ''
 
     chat = gettingChats()
+    chat.extend(gettingGroupChats())
+
+
+    all_user = userInformation(None)
 
     if request.method == "POST":
 
@@ -349,9 +372,9 @@ def homepage():
 
         companion = chatParticipantProfile(chat_name[0])
 
-        return render_template('HomePage.html', user=user, myChat=chat, name=chat_name, message=messages_chat, companion=companion, chat_id=chat_id)
+        return render_template('HomePage.html', user=user, myChat=chat, name=chat_name, message=messages_chat, companion=companion, chat_id=chat_id, all_user=all_user)
 
-    return render_template('HomePage.html', user=user, myChat=chat, name=chat_name, message=messages_chat)
+    return render_template('HomePage.html', user=user, myChat=chat, name=chat_name, message=messages_chat, all_user=all_user)
 
 
 # Обработчик удаления аватара пользователя
@@ -409,13 +432,18 @@ def deletemessage():
         db.engine.execute(sql)
     except:
         flash('Ошибка удаления сообщения')
+
     return redirect(url_for('homepage'))
 
 
 @app.route('/getuseravatar', methods=['POST', 'GET'])
 def getuseravatar():
-    useremail = request.args.get('useremail')
-    user = User.query.filter_by(email=useremail).first()
+    userfield = request.args.get('useremail')
+    if userfield.isdigit():
+        user = User.query.filter_by(id=userfield).first()
+    else:
+        user = User.query.filter_by(email=userfield).first()
+
     img = user.GetAvatar(app)
     if not img:
         return ""
@@ -437,6 +465,8 @@ def sendmessage():
 
     chat = gettingChats()
 
+    chat.extend(gettingGroupChats())
+
     messages_chat = receivingChatMessages(chat_id)
 
     chat_name = gettingChatParticipants(chat_id)
@@ -444,6 +474,41 @@ def sendmessage():
     companion = chatParticipantProfile(chat_name[0])
 
     return render_template('HomePage.html', user=current_user, myChat=chat, name=chat_name, message=messages_chat, companion=companion, chat_id=chat_id)
+
+
+@app.route('/creatingchat', methods=['POST'])
+def creatingChat():
+
+    if request.method == 'POST':
+        chat_name = request.form['ChatNameCreate']
+        # Люди в чате
+        group = [current_user.email]
+
+        for number, row in enumerate(request.form.items()):
+            if number != 0:
+                group.append(row[0])
+
+        if chat_name is not None:
+
+            sql = text("INSERT INTO 'Чат' (chat_name, chat_description, chat_creator) "
+                       "VALUES ('{}','{}','{}')".format(chat_name, 'chat', current_user.email))
+            db.engine.execute(sql)
+
+            sql = text("select * "
+                       "from 'Чат' "
+                       "where chat_creator == '{}'"
+                       "order by chat_id desc "
+                       "limit 1".format(current_user.email))
+
+            last_chat = db.engine.execute(sql).first()
+
+            # Проходимся по каждому человеку
+            for people in group:
+                sql = text("INSERT INTO 'Список Участников Чата' (chat_id, email) "
+                           "VALUES ({},'{}')".format(last_chat[0], people))
+                db.engine.execute(sql)
+
+    return redirect(url_for('homepage'))
 
 
 if __name__ == '__main__':
