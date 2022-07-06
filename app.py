@@ -19,7 +19,7 @@ db = SQLAlchemy(app)
 # migrate = Migrate(app, db)
 login_manager = LoginManager(app)
 
-
+#region БД
 chat_user = db.Table(
     'Список Участников Чата',
     db.Column('chat_id', db.Integer(), db.ForeignKey('Чат.chat_id')),
@@ -107,6 +107,7 @@ class Message(db.Model):
     message_content = db.Column(db.String(120))
     message_date_sent = db.Column(db.DateTime, default=datetime.utcnow)
     message_status = db.Column(db.Integer, default=0)
+#endregion
 
 
 @login_manager.user_loader
@@ -349,6 +350,8 @@ def homepage():
     user = current_user
     chat_name = ''
     messages_chat = ''
+    selectedchat = ''
+    chatparticipants = ''
 
     chat = gettingChats()
     chat.extend(gettingGroupChats())
@@ -359,10 +362,21 @@ def homepage():
     if request.method == "POST":
 
         chat_id = request.args.get('chat_id', 1, type=int)
+        print(chat_id)
+
+        sql = text("select * "
+                   "from 'Чат' "
+                   "where chat_id == {}".format(chat_id))
+        selectedchat = db.engine.execute(sql).first()
+
+        sql = text("select email "
+                   "from 'Список Участников Чата' "
+                   "where chat_id == {} and email != '{}' ".format(chat_id, current_user.email))
+        chatparticipants = [row for row in db.engine.execute(sql)]
 
         sql = text("UPDATE 'Сообщение' "
                    "set message_status = 1 "
-                   "where chat_id == '{}' and message_sender !='{}'".format(chat_id, current_user.id))
+                   "where chat_id == {} and message_sender !='{}'".format(chat_id, current_user.id))
 
         db.engine.execute(sql)
 
@@ -372,9 +386,25 @@ def homepage():
 
         companion = chatParticipantProfile(chat_name[0])
 
-        return render_template('HomePage.html', user=user, myChat=chat, name=chat_name, message=messages_chat, companion=companion, chat_id=chat_id, all_user=all_user)
+        return render_template('HomePage.html',
+                               user=user,
+                               myChat=chat,
+                               name=chat_name,
+                               message=messages_chat,
+                               companion=companion,
+                               chat_id=chat_id,
+                               all_user=all_user,
+                               selectedchat=selectedchat,
+                               chatparticipants=chatparticipants)
 
-    return render_template('HomePage.html', user=user, myChat=chat, name=chat_name, message=messages_chat, all_user=all_user)
+    return render_template('HomePage.html',
+                           user=user,
+                           myChat=chat,
+                           name=chat_name,
+                           message=messages_chat,
+                           all_user=all_user,
+                           selectedchat=selectedchat,
+                           chatparticipants=chatparticipants)
 
 
 # Обработчик удаления аватара пользователя
@@ -465,6 +495,16 @@ def sendmessage():
 
     chat = gettingChats()
 
+    sql = text("select * "
+               "from 'Чат' "
+               "where chat_id == {}".format(chat_id))
+    selectedchat = db.engine.execute(sql).first()
+
+    sql = text("select email "
+               "from 'Список Участников Чата' "
+               "where chat_id == {} and email != '{}' ".format(chat_id, current_user.email))
+    chatparticipants = [row for row in db.engine.execute(sql)]
+
     chat.extend(gettingGroupChats())
 
     messages_chat = receivingChatMessages(chat_id)
@@ -473,7 +513,15 @@ def sendmessage():
 
     companion = chatParticipantProfile(chat_name[0])
 
-    return render_template('HomePage.html', user=current_user, myChat=chat, name=chat_name, message=messages_chat, companion=companion, chat_id=chat_id)
+    return render_template('HomePage.html',
+                           user=current_user,
+                           myChat=chat,
+                           name=chat_name,
+                           message=messages_chat,
+                           companion=companion,
+                           chat_id=chat_id,
+                           selectedchat=selectedchat,
+                           chatparticipants=chatparticipants)
 
 
 @app.route('/creatingchat', methods=['POST'])
