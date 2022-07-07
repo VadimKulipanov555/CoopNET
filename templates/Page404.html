@@ -1,0 +1,9 @@
+{% extends 'bases/ErrorPageForm.html' %}
+
+{% block title %}
+    Страница не найдена
+{% endblock %}
+
+{% block content %}
+    <h3 class="text-center" style="color: #BFAE1F">Страница не найдена, вернуться на <a href="{{ url_for('homepage') }}">Главную</a> страницу</h3>
+{% endblock %}

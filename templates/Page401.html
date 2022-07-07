@@ -1,0 +1,9 @@
+{% extends 'bases/ErrorPageForm.html' %}
+
+{% block title %}
+    Не авторизован
+{% endblock %}
+
+{% block content %}
+    <h3 class="text-center" style="color: #BFAE1F">Для просмотра содержимого страницы вы должны авторизоваться. Перейти на страницу <a href="{{ url_for('authorization') }}">авторизации</a>.</h3>
+{% endblock %}
