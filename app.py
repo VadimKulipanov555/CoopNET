@@ -1,8 +1,7 @@
-from flask import Flask, url_for, redirect, session, render_template, request, flash, make_response
+from flask import Flask, url_for, redirect, render_template, request, flash, make_response
 
 from myConfig import Config
 from flask_sqlalchemy import SQLAlchemy
-# from flask_migrate import Migrate
 from flask_login import LoginManager, UserMixin, current_user, logout_user, login_required, login_user
 import phonenumbers
 import re
@@ -16,10 +15,9 @@ app.config.from_object(Config)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///coopNet.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-# migrate = Migrate(app, db)
 login_manager = LoginManager(app)
 
-#region БД
+# region БД
 chat_user = db.Table(
     'Список Участников Чата',
     db.Column('chat_id', db.Integer(), db.ForeignKey('Чат.chat_id')),
@@ -238,16 +236,16 @@ def isValidUser(error, user):
 # Необходимо еще возвращать id собеседника
 def gettingChats():
     # Получаем все чаты пользователя
-    sql = text("select allChats.chat_id, allChats.email, allChats.message_content, allChats.message_date_sent "
-               "from (select chat_id, email, message_content, message_date_sent "
-               "from (select * "
-               "from (select ch.chat_id, email "
-               "from (select chat_id "
-               "from 'Список Участников Чата' "
-               "where chat_id not in (select chat_id from 'Чат' where chat_description=='chat') and email=='{0}') ch inner join 'Список Участников Чата' ch2 on ch.chat_id ==ch2.chat_id "
-               "where email != '{0}') ch left outer join Сообщение c on ch.chat_id = c.chat_id "
-               "order by message_date_sent desc) t "
-               "group by t.chat_id) allChats left join 'Пользователь' user on allChats.email = user.email".format(current_user.email))
+    sql = text("select inf.chat_id, me, friend, p.email, message_id, message_sender, message_content, message_date_sent, message_status "
+               "from (  select * "
+               "from (  select info_chat.chat_id, me, friend, message_id, message_sender, message_content, message_date_sent, message_status "
+               "from (  select f_chat.chat_id, f_chat.user_id as me, s_chat.user_id as friend "
+               "from 'Список Участников Чата' f_chat inner join 'Список Участников Чата' s_chat on f_chat.chat_id==s_chat.chat_id "
+               "where f_chat.user_id=='{}' and f_chat.user_id!=s_chat.user_id and f_chat.chat_id not in (select chat_id from 'Чат' where chat_description=='chat') "
+               ") info_chat left outer join 'Сообщение' mes on info_chat.chat_id == mes.chat_id "
+               "order by message_date_sent desc "
+               ") chat_mes "
+               "group by chat_mes.chat_id) inf inner join 'Пользователь' p on inf.friend == p.id".format(current_user.id))
     return [row for row in db.engine.execute(sql)]
 
 
