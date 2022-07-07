@@ -1,4 +1,4 @@
-{% extends 'FormBase.html' %}
+{% extends 'bases/FormBase.html' %}
 
 {% block title %}
 
@@ -27,6 +27,13 @@
                             <label for="name">Имя</label>
                         </div>
 
+                        <!-- Логин -->
+                        <div class="form-floating col-md-6 m-0">
+                            <input class="form-control" id="login" name="login" type="text" value='{{ message[1]['login'] }}'
+                                   placeholder="Логин">
+                            <label for="login">Логин</label>
+                        </div>
+
                         <!-- Фамилия-->
 {#                        <div class="form-floating col-md-6 m-0">#}
 {#                            <input class="form-control" id="lastname" name="lastname" type="text"#}
@@ -36,27 +43,15 @@
 
                     </div>
 
-                    <!-- Form Row -->
-                    <div class="row gx-3 mb-2">
-
-                        <!-- Логин -->
-                        <div class="form-floating col-md-6 m-0">
-                            <input class="form-control" id="login" name="login" type="text" value='{{ message[1]['login'] }}'
-                                   placeholder="Логин">
-                            <label for="login">Логин</label>
-                        </div>
-
-                        <!-- Телефон -->
-                        <div class="form-floating col-md-6 m-0">
-                            <input class="form-control" id="phone" name="phone" type="text" value='{{ message[1]['phone'] }}'
-                                   placeholder="Телефон">
-                            <label for="phone">Телефон</label>
-                        </div>
-
+                    <!-- Телефон -->
+                    <div class="form-floating mb-2 input-group flex-nowrap">
+                        <span class="input-group-text border-start" id="addon-wrapping" style="border-top-left-radius: 30px; border-bottom-left-radius: 30px;">+7</span>
+                        <input class="form-control" id="phone" name="phone" type="text" value='{{ message[1]['phone'] }}'
+                               placeholder="Номер телефона" aria-describedby="addon-wrapping" maxlength="10" minlength="10">
                     </div>
 
                     <!-- Email -->
-                    <div class="form-floating mb-2">
+                    <div class="form-floating ">
                         <input class="form-control" id="reg_email" name="reg_email" type="text" value='{{ message[1]['email'] }}'
                                placeholder="name@example.com">
                         <label for="reg_email">Email</label>
@@ -91,7 +86,7 @@
             <!-- endregion -->
 
             <!-- Переход на страницу авторизации -->
-            <div class="form-text text-center mt-4 text-dark">Есть аккаунт? <a href="/authorization" class="fw-bold" style="text-decoration: none; color: #BFAE1F;">Авторизация</a>
+            <div class="form-text text-center mt-4 text-dark">Есть аккаунт? <a href="Authorization.html" class="fw-bold" style="text-decoration: none; color: #BFAE1F;">Авторизация</a>
             </div>
             <p class="mt-4 mb-3 text-muted">© 2017–2022</p>
         </form>
