@@ -180,12 +180,12 @@
                                         {% for item in all_user %}
 
                                             <div class="form-check m-0 my-1 p-0 d-flex flex-row-reverse align-items-center justify-content-between">
-                                                <input class="form-check-input" type="checkbox" name="{{ item[1] }}" value="" id="UserInChatCheck_{{ item[0] }}">
+                                                <input class="form-check-input" type="checkbox" name="{{ item[0] }}" value="" id="UserInChatCheck_{{ item[0] }}">
                                                 <label class="form-check-label" for="UserInChatCheck_{{ item[0] }}">
                                                     <div class="Chat d-flex flex-row align-items-center justify-content-between">
                                                         <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">
 
-                                                            <img src="{{ url_for('getuseravatar', useremail=item[1]) }}"
+                                                            <img src="{{ url_for('getuseravatar', userfield=item[0]) }}"
                                                                  alt="Avatar" width="55" height="55"
                                                                  class="me-2 rounded-circle">
                                                             <div class="ChatInfo me-4 d-flex flex-column justify-content-center align-items-start">
@@ -223,26 +223,49 @@
 
                 <!-- Чат -->
                 {% for item in myChat %}
-                    <form method="POST" action="{{ url_for('homepage', chat_id=item[0]) }}">
+                    <form method="POST" class="my-1" action="{{ url_for('homepage', selectedchat=item[0]) }}">
                         <button class="Chat px-3 d-flex flex-row align-items-center justify-content-between" style="border: none; outline: none; background-color: inherit">
-                            <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">
-                                <a href="/" class="me-2">
-                                    <img src="{{ url_for('getuseravatar', useremail=item[1]) }}" alt="Avatar" width="55" height="55"
+                            {% if item[2] == 'chat' %}
+                                <div class="ChatInformation d-flex flex-row flex-grow-1 align-items-center justify-content-between">
+                                    <img src="{{ url_for('getchatavatar', chatfield=item[0]) }}" alt="Avatar"
+                                         width="55" height="55"
                                          class="rounded-circle">
-                                </a>
-                                <div class="ChatInfo me-4 d-flex flex-column justify-content-center align-items-start">
+                                    <div class="ChatInfo ms-2 me-4 d-flex flex-column justify-content-center align-items-start">
 
-                                    <h6 class="m-0" style="color: white">{{ item[1] }}</h6>
+                                        <h6 class="m-0" style="color: white">{{ item[1] }}</h6>
 
-                                    <p class="m-0 mt-1" style="font-size: small; color: white">
-                                        {% if item[2] == None %}{{ 'пусто' }}{% else %}{{ item[2] }}{% endif %}</p>
+                                        <p class="m-0 mt-1" style="font-size: small; color: white">
+                                            {% if item[5] == None %}{{ 'пусто' }}{% else %}{{ item[5] }} {% endif %}
+                                                </p>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="Time d-flex justify-content-center align-items-start">
-                                <p style="color: white">
-                                    {% if item[3] == None %}{{ '' }}{% else %}{{ item[3][11:16] }}{% endif %}</p>
-                            </div>
+                                <div class="Time d-flex justify-content-center align-items-start">
+                                    <p style="color: white">
+                                        {% if item[6] == None %}{{ '' }}{% else %}
+                                            {{ item[6][11:16] }}{% endif %}</p>
+                                </div>
+                            {% else %}
+                                <div class="ChatInformation d-flex flex-row flex-grow-1 align-items-center justify-content-between">
+                                    <img src="{{ url_for('getuseravatar', userfield=item[2]) }}" alt="Avatar"
+                                         width="55" height="55"
+                                         class="rounded-circle">
+                                    <div class="ChatInfo ms-2 me-4 d-flex flex-column justify-content-center align-items-start">
+
+                                        <h6 class="m-0" style="color: white">{{ item[3] }}</h6>
+
+                                        <p class="m-0 mt-1" style="font-size: small; color: white">
+                                            {% if item[6] == None %}{{ 'пусто' }}{% else %}{{ item[6] }} {% endif %}
+                                                </p>
+                                    </div>
+                                </div>
+
+                                <div class="Time d-flex justify-content-center align-items-start">
+                                    <p style="color: white">
+                                        {% if item[7] == None %}{{ '' }}{% else %}
+                                            {{ item[7][11:16] }}{% endif %}</p>
+                                </div>
+                            {% endif %}
                         </button>
                     </form>
                 {% endfor %}
@@ -300,7 +323,7 @@
                                                             aria-label="Close"></button>
                                                 </div>
                                                 <div class="ProfileNameInfo mt-3 d-flex flex-row align-items-center justify-conten-start">
-                                                    <a href="/" class="me-3"><img src="{{ url_for('getuseravatar', useremail=companion.email) }}"
+                                                    <a href="/" class="me-3"><img src="{{ url_for('getuseravatar', userfield=companion.id) }}"
                                                                               alt="Avatar"
                                                                               width="100" height="100"
                                                                               class="rounded-circle">
@@ -362,15 +385,54 @@
 
                                         <div class="modal-header d-flex flex-column justify-content-center align-items-start">
 
-                                            <div class="d-flex flex-row align-self-stretch justify-content-between align-items-center">
-                                                <h5 class="modal-title me-2" id="InterlocutorModalLabel">Информация</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                        aria-label="Close"></button>
-                                            </div>
-                                            <div class="ProfileNameInfo mt-3 d-flex flex-row align-items-center justify-conten-start">
-                                                <div class="d-flex flex-row align-items-center">
-                                                    <h6>Название чата: {{ selectedchat[1] }}</h6>
+                                            <div class="ProfileNameInfo mt-3 d-flex flex-row align-self-stretch align-items-center justify-content-around">
+
+                                                <div class="d-flex flex-column align-items-center justify-content-center">
+                                                    <!-- Profile picture image-->
+                                                    <div class="d-flex flex-column align-items-center">
+                                                        <img class="img-account-profile rounded-circle mb-2"
+                                                             src="{{ url_for('getchatavatar', chatfield=selectedchat[0]) }}" alt="" width="200"
+                                                             height="200">
+                                                        <a href="{{ url_for('removechatavatar', chatfield=selectedchat[0]) }}" class="text-danger"
+                                                           style="text-decoration: none;">Удалить фото профиля?</a>
+                                                    </div>
+                                                    <!-- Profile picture help block-->
+                                                    <div class="small font-italic text-muted mb-2 mt-4">Размер фото
+                                                        не более 5 MB
+                                                    </div>
+                                                    <form action="{{ url_for('chatupload', chatfield=selectedchat[0]) }}"
+                                                          method="post"
+                                                          enctype="multipart/form-data" class="d-flex flex-row">
+                                                        <div class="text-center me-2">
+                                                            <input name="file_chat" type="file" id="file_chat"
+                                                                   class="input input__file"
+                                                                   style="opacity: 0; visibility: hidden; position: absolute;">
+                                                            <label for="file_chat"
+                                                                   class="input__file-button border border-primary p-2"
+                                                                   style="border-radius: 10px">
+                                                            <span class="input__file-icon-wrapper mr-1 text-primary">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="25"
+                                                                     fill="currentColor"
+                                                                     class="bi bi-upload input__file-icon" viewBox="0 0 16 16">
+                                                                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                                                                    <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
+                                                                </svg>
+                                                            </span>
+                                                                <span class="input__file-button-text text-primary">Выберите файл</span>
+                                                            </label>
+                                                        </div>
+                                                        <input type="submit" class="btn btn-primary"
+                                                               value="Загрузить">
+                                                    </form>
                                                 </div>
+
+                                                <div class="d-flex flex-row align-self-stretch align-items-center justify-content-start" style="border: none; outline: none; background-color: inherit">
+                                                    <div class="info">
+                                                        <p class="m-0" style="font-size: xx-large">{{ selectedchat[1] }}</p>
+                                                        <p class="m-0 text-secondary" style="font-size: smaller">Название чата</p>
+                                                    </div>
+                                                </div>
+
                                             </div>
 
                                         </div>
@@ -379,17 +441,17 @@
 
                                             <div class="d-flex flex-column justify-content-center align-items-start">
                                                 {% for participant in chatparticipants %}
-                                                    <div class="Chat px-3 d-flex flex-row align-items-center justify-content-between"
+                                                    <div class="Chat my-1 px-3 d-flex flex-row align-items-center justify-content-between"
                                                             style="border: none; outline: none; background-color: inherit">
                                                         <div class="ChatInformation d-flex flex-row align-items-center justify-content-between">
                                                             <a href="/" class="me-2">
-                                                                <img src="{{ url_for('getuseravatar', useremail=participant[0]) }}"
+                                                                <img src="{{ url_for('getuseravatar', userfield=participant[0]) }}"
                                                                      alt="Avatar" width="55" height="55"
                                                                      class="rounded-circle">
                                                             </a>
                                                             <div class="ChatInfo me-4 d-flex flex-column justify-content-center align-items-start">
 
-                                                                <h6 class="m-0">{{ participant[0] }}</h6>
+                                                                <h6 class="m-0">{{ participant[1] }}</h6>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -422,22 +484,32 @@
                                     <!-- Сообщение 1 -->
                                     {% for mes in message %}
                                     <div class="MessageBlock my-1 d-flex flex-row align-items-end">
-                                        <a href="/" class="me-2"><img src="{{ url_for('getuseravatar', useremail=mes[2]) }}" alt="Avatar" width="30" height="30"
+                                        <a href="/" class="me-2"><img src="{{ url_for('getuseravatar', userfield=mes[2]) }}" alt="Avatar" width="30" height="30"
                                              class="rounded-circle">
                                         </a>
                                         <div class="MessageAndTime p-2 d-flex flex-row align-items-center justify-content-between border" style="background-color: white; border-radius: 10px">
-                                            <p class="m-0 me-3">{{ mes[3] }}</p>
-                                            <div class="m-0 d-flex flex-column align-self-stretch justify-content-between align-items-center">
-                                                <form action="{{ url_for('deletemessage') }}" method="post">
-                                                    <button type="submit" name="submit" value="{{ mes[0] }}" class="mt-1 d-flex justify-self-center" style="border: none; outline: none; background-color: inherit">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="darkred"
-                                                             class="bi bi-trash3" viewBox="0 0 16 16">
-                                                            <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z"/>
-                                                        </svg>
-                                                    </button>
-                                                </form>
-                                                <p class="m-0 d-flex justify-self-center" style="font-size: smaller">{{ mes[4][11:16] }}</p>
+                                            <div class="me-3 d-flex flex-column align-items-start justify-content-between">
+                                                <p class="m-0" style="color: #470323; font-weight: bold">{{ mes[3] }}</p>
+                                                <p class="m-0">{{ mes[4] }}</p>
                                             </div>
+                                            {% if user.id == mes[2] %}
+                                                <div class="m-0 d-flex flex-column align-self-stretch justify-content-between align-items-center">
+                                                    <form action="{{ url_for('deletemessage', chat_id=chat_id) }}" method="post">
+                                                        <button type="submit" name="submit" value="{{ mes[0] }}" class="mt-1 d-flex justify-self-center" style="border: none; outline: none; background-color: inherit">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="darkred"
+                                                                 class="bi bi-trash3" viewBox="0 0 16 16">
+                                                                <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z"/>
+                                                            </svg>
+                                                        </button>
+                                                    </form>
+
+                                                    <p class="m-0 d-flex justify-self-center" style="font-size: smaller">{{ mes[5][11:16] }}</p>
+                                                </div>
+                                            {% else %}
+                                                <div class="m-0 d-flex flex-column align-self-stretch justify-content-end align-items-center">
+                                                    <p class="m-0 d-flex justify-self-center" style="font-size: smaller">{{ mes[5][11:16] }}</p>
+                                                </div>
+                                            {% endif %}
                                         </div>
                                     </div>
                                     {% endfor %}
