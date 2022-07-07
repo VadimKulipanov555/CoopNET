@@ -92,7 +92,7 @@ class Chat(db.Model):
     chat_name = db.Column(db.String(32))
     chat_description = db.Column(db.String(70))
     chat_photo = db.Column(db.BLOB, nullable=True)
-    chat_creator = db.Column(db.String(320), db.ForeignKey('Пользователь.id'))
+    chat_creator = db.Column(db.Integer, db.ForeignKey('Пользователь.id'))
 
     # Для получения доступа к связанным объектам
     cats = db.relationship('User', secondary=chat_user, backref=db.backref('tasks', lazy='dynamic'))
@@ -100,7 +100,7 @@ class Chat(db.Model):
     # Получаем аватар пользователя
     def GetAvatar(self, app):
         img = None
-        if not self.photo:
+        if not self.chat_photo:
             try:
                 with app.open_resource(app.root_path + url_for('static', filename='images/ChatAvatar.png'),
                                        'rb') as f:
@@ -108,7 +108,7 @@ class Chat(db.Model):
             except FileNotFoundError as e:
                 print(f'Не найден аватар по умолчанию: {str(e)}')
         else:
-            img = self.photo
+            img = self.chat_photo
 
         return img
 
@@ -124,7 +124,7 @@ class Chat(db.Model):
         if not avatar:
             return False
         try:
-            self.photo = avatar
+            self.chat_photo = avatar
             db.session.commit()
         except Exception as e:
             print(f'Ошибка обновления аватара в БД: {str(e)}')
@@ -134,7 +134,7 @@ class Chat(db.Model):
     # Удаление аватара
     def RemoveAvatar(self):
         try:
-            self.photo = None
+            self.chat_photo = None
             db.session.commit()
         except Exception as e:
             print(f'Ошибка удаления аватара из БД: {str(e)}')
@@ -146,7 +146,7 @@ class Message(db.Model):
     __tablename__ = 'Сообщение'
     message_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     chat_id = db.Column(db.Integer, db.ForeignKey('Чат.chat_id'))
-    message_sender = db.Column(db.String(320), db.ForeignKey('Пользователь.id'))
+    message_sender = db.Column(db.Integer, db.ForeignKey('Пользователь.id'))
     message_content = db.Column(db.String(120))
     message_date_sent = db.Column(db.DateTime, default=datetime.utcnow)
     message_status = db.Column(db.Integer, default=0)
@@ -252,7 +252,7 @@ def gettingChats():
 # Получаем все групповые чаты авторизованного пользователя (Оптимизировано)
 def gettingGroupChats():
 
-    sql = text("select chat_id, chat_name, message_content, message_date_sent, chat_description, chat_creator, message_id, message_status "
+    sql = text("select chat_id, chat_name, chat_description, chat_creator, message_id, message_content, message_date_sent, message_status "
                "from (select chInfo.*, c.message_id, c.message_content, c.message_date_sent, c.message_status "
                "from (select myCh.*, ch.chat_name, ch.chat_description, ch.chat_creator "
                "from (select chat_id "
@@ -267,10 +267,11 @@ def gettingGroupChats():
 
 # Получаем все сообщения одного чата по его id (Оптимизировано)
 def receivingChatMessages(chat_id):
-    sql = text("select * "
+    sql = text("select mes.message_id, mes.chat_id, mes.message_sender, user.name, mes.message_content, mes.message_date_sent, mes.message_status "
+               "from (select * "
                "from 'Сообщение' "
                "where chat_id == '{}' "
-               "order by message_date_sent asc".format(chat_id))
+               "order by message_date_sent asc) mes left join 'Пользователь' user on mes.message_sender = user.id ".format(chat_id))
 
     return [row for row in db.engine.execute(sql)]
 
@@ -345,19 +346,19 @@ def registration():
                                                                                   datetime.utcnow()))
             db.engine.execute(sql)
 
-            sql = text("select p1.email, p2.email "
+            sql = text("select p1.id, p1.email, p2.id, p2.email "
                        "from 'Пользователь' p1 inner join 'Пользователь' p2 "
                        "    on p1.email !=p2.email and p1.email == '{}'".format(request.form['reg_email'].lower()))
 
             table = [row for row in db.engine.execute(sql)]
             for row in table:
                 try:
-                    user1, user2 = row
+                    user1_id, user1_email, user2_id, user2_email = row
 
-                    user_in_db = db.session.query(User).filter_by(email=user1).first()
-                    user_in_db_2 = db.session.query(User).filter_by(email=user2).first()
+                    user_in_db = db.session.query(User).filter_by(email=user1_email).first()
+                    user_in_db_2 = db.session.query(User).filter_by(email=user2_email).first()
 
-                    chat = Chat(chat_name=user2, chat_description='friend', chat_creator=user1)
+                    chat = Chat(chat_name=user2_email, chat_description='friend', chat_creator=user1_id)
                     chat.cats.append(user_in_db)
                     chat.cats.append(user_in_db_2)
                     db.session.add(chat)
@@ -448,14 +449,17 @@ def homepage():
 
         chat_user_id = gettingChatParticipants(chat_id)
 
-        chat_name = gettingChatNameById(chat_user_id[0])
+        if selectedchat[2] == 'chat':
+            chat_name = (selectedchat[1],)
+        else:
+            chat_name = gettingChatNameById(chat_user_id[0])
 
         companion = chatParticipantProfile(chat_user_id[0])
 
         return render_template('HomePage.html',
                                user=user,
                                myChat=chat,
-                               name=chat_name[0],
+                               name=chat_name,
                                message=messages_chat,
                                companion=companion,
                                chat_id=chat_id,
@@ -540,8 +544,9 @@ def chatupload():
     if request.method == 'POST':
         chatfield = request.args.get('chatfield')
         chat = Chat.query.filter_by(chat_id=chatfield).first()
-        file = request.files.get('file')
-        if file and Chat.VerifyExt(file.filename):
+
+        file = request.files.get('file_chat')
+        if file and chat.VerifyExt(file.filename):
             try:
                 img = file.read()
                 result = chat.UpdateAvatar(img)
@@ -677,7 +682,7 @@ def creatingChat():
 
         # Проходимся по каждому человеку
         for people in group:
-            sql = text("INSERT INTO 'Список Участников Чата' (chat_id, id) "
+            sql = text("INSERT INTO 'Список Участников Чата' (chat_id, user_id) "
                        "VALUES ({},'{}')".format(new_group_chat[0], people))
             db.engine.execute(sql)
 
